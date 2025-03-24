@@ -5,6 +5,7 @@ steps:
     # Use the official jekyll build container
     image: node
     commands:
+      - cd extension
       - npm ci
       - npm run lint
       - apt update

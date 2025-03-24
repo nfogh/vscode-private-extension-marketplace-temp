@@ -7,7 +7,7 @@
 			"path": "remote-helper"
 		},
 		{
-			"path": ".github"
+			"path": ".woodpecker"
 		}
 	],
 	"settings": {
