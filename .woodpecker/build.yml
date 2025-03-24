@@ -1,13 +1,17 @@
-steps:
-  build:
-    when:
-      event: [push, pull_request]
-    # Use the official jekyll build container
-    image: node
-    commands:
-      - cd extension
-      - npm ci
-      - npm run lint
-      - apt update
-      - apt install xvfb xvfb-run xserver-xorg-core
-      - xvfb-run npm run test
+matrix:
+  EXTENSION:
+    - extension
+    - remote-helper
+  steps:
+    build:
+      when:
+        event: [push, pull_request]
+      image: node
+      commands:
+        - cd ${EXTENSION}
+        - npm ci
+        - npm run lint
+        - apt update
+        - apt install xvfb xserver-xorg-core
+        - xvfb-run npm run test
+  
