@@ -12,6 +12,6 @@ steps:
       - npm ci
       - npm run lint
       - apt update
-      - apt install xvfb xserver-xorg-core
+      - DEBIAN_FRONTEND=noninteractive apt install -y xvfb xserver-xorg-core
       - xvfb-run npm run test
   
