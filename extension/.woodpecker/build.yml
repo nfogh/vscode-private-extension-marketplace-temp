@@ -1,0 +1,12 @@
+steps:
+  build:
+    when:
+      event: [push, pull_request]
+    # Use the official jekyll build container
+    image: node
+    commands:
+      - npm ci
+      - npm run lint
+      - apt update
+      - apt install xvfb xvfb-run xserver-xorg-core
+      - xvfb-run npm run test
