@@ -33,4 +33,5 @@ steps:
         from_secret: ovsx_pat
     commands:
       - cd /woodpecker/git/${EXTENSION}
+      - npm ci
       - npm run deploy
