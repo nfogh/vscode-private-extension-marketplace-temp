@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace-helper",
     "displayName": "Private Extension Marketplace: Helper",
     "description": "Lets Private Extension Marketplace work in remote workspaces.",
-    "version": "1.10.0",
+    "version": "1.10.1",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -10,7 +10,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/nfogh/vscode-private-extension-manager.git",
+        "url": "https://codeberg.org/nfogh/vscode-private-extension-marketplace.git",
         "directory": "remote-helper"
     },
     "engines": {

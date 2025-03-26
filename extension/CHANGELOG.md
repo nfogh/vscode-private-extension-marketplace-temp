@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.10.1
+
+-   Fixed: Move to codeberg.org
+
 ## 1.10.0
 
 -   Added: Autodetect registry type if "type" is not specified
