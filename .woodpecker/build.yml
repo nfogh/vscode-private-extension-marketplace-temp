@@ -8,7 +8,8 @@ steps:
       event: [push, pull_request]
     image: node
     commands:
-      - cd ${EXTENSION}
+      - ln -s ${EXTENSION} e
+      - cd e
       - npm ci
       - npm run lint
       - apt update
