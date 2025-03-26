@@ -2,6 +2,8 @@
 
 [![Build status](https://ci.codeberg.org/api/badges/14375/status.svg)](https://ci.codeberg.org/repos/14375)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/NikolajFogh.private-extension-marketplace?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=NikolajFogh.private-extension-marketplace)
+[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/NikolajFogh/private-extension-marketplace?label=Open%20VSX)](https://open-vsx.org/extension/NikolajFogh/private-extension-marketplace)
 
 Private Extension Marketplace is a Visual Studio Code extension that lets you find,
 install, and update extensions from any NPM registry or OpenVSX instance. This lets
