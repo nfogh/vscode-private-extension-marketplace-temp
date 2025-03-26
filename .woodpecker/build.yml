@@ -1,3 +1,9 @@
+clone:
+   - name: git
+     image: woodpeckerci/plugin-git
+     settings:
+        path: /woodpecker/git
+
 matrix:
   EXTENSION:
     - extension
@@ -8,8 +14,7 @@ steps:
       event: [push, pull_request]
     image: node
     commands:
-      - ln -s ${EXTENSION} e
-      - cd e
+      - cd /woodpecker/git/${EXTENSION}
       - npm ci
       - npm run lint
       - apt update
