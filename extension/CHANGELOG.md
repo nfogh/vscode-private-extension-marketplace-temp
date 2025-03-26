@@ -1,6 +1,6 @@
 # Change Log
 
-## 1.10.1
+## 1.10.2
 
 -   Fixed: Move to codeberg.org
 
