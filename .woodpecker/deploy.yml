@@ -1,0 +1,19 @@
+matrix:
+  EXTENSION:
+    - extension
+    - remote-helper
+steps:
+  - name: deploy
+    when:
+      event: tag
+    image: node
+    environment:
+      VSCE_PAT:
+        from_secret: vsce_pat
+      OVSX_PAT:
+        from_secret: ovsx_pat
+    commands:
+      - cd ${EXTENSION}
+      - npm publish
+depends_on:
+  - build

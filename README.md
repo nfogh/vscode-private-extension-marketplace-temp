@@ -1,8 +1,6 @@
 # Private Extension Marketplace for Visual Studio Code
 
-![build status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/main.yml/badge.svg)
-![publish status](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/publish.yml/badge.svg)
-[![CodeQL](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/nfogh/vscode-private-extension-manager/actions/workflows/github-code-scanning/codeql)
+[![Build status](https://ci.codeberg.org/api/badges/14375/status.svg)](https://ci.codeberg.org/repos/14375)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Private Extension Marketplace is a Visual Studio Code extension that lets you find,

@@ -33,6 +33,7 @@
     ],
     "main": "./dist/extension.js",
     "scripts": {
+        "deploy": "vsce publish && ovsx publish",
         "vscode:prepublish": "npm run package",
         "clean": "rimraf ./dist ./out",
         "compile": "webpack",
@@ -61,6 +62,7 @@
         "eslint-plugin-prettier": "^4.0.0",
         "glob": "^7.2.0",
         "mocha": "^11.1.0",
+        "ovsx": "^0.10.1",
         "prettier": "^2.5.1",
         "rimraf": "^3.0.2",
         "source-map-support": "^0.5.21",

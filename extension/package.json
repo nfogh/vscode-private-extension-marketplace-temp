@@ -315,6 +315,7 @@
         }
     },
     "scripts": {
+        "deploy": "vsce publish && ovsx publish",
         "vscode:prepublish": "npm run package",
         "clean": "rimraf ./dist ./out",
         "compile": "webpack",
@@ -362,6 +363,7 @@
         "json-loader": "^0.5.7",
         "mocha": "^11.1.0",
         "nock": "^13.2.1",
+        "ovsx": "^0.10.1",
         "prettier": "^2.5.1",
         "sinon": "^19.0.2",
         "source-map-support": "^0.5.21",
