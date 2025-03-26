@@ -32,5 +32,5 @@ steps:
       OVSX_PAT:
         from_secret: ovsx_pat
     commands:
-      - cd ${EXTENSION}
-      - npm publish
+      - cd /woodpecker/git/${EXTENSION}
+      - npm run publish
