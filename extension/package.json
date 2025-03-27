@@ -27,7 +27,10 @@
         "Other"
     ],
     "keywords": [
-        "multi-root-ready"
+        "extension",
+        "vsix",
+        "marketplace",
+        "private"
     ],
     "activationEvents": [
         "onStartupFinished"

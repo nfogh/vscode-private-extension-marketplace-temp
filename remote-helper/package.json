@@ -24,8 +24,11 @@
         "Other"
     ],
     "keywords": [
-        "multi-root-ready",
-        "remote"
+        "remote",
+        "vsix",
+        "extension",
+        "marketplace",
+        "private"
     ],
     "activationEvents": [
         "onCommand:_privateExtensionMarketplace.remoteHelper.getExtension",
