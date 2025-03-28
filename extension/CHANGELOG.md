@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.10.3
+
+-   Fixed: Always enable registry add and remove commands
+-   Fixed: Remove unavailable commands
+
 ## 1.10.2
 
 -   Fixed: Move to codeberg.org

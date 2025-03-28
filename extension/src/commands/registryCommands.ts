@@ -2,102 +2,83 @@ import { isWebUri } from 'valid-url';
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
-import { Command } from '../commandManager';
 import { Registry } from '../Registry';
-import { RegistryProvider } from '../RegistryProvider';
+import * as UserRegistry from '../UserRegistry';
 
 const localize = nls.loadMessageBundle();
 
-export class AddUserRegistryCommand implements Command {
-    public readonly id = 'privateExtensions.registry.add';
+export async function AddUserRegistryCommand(): Promise<void> {
+    const registry = await vscode.window.showInputBox({
+        prompt: localize('registry.url.prompt', 'Enter the URL of the NPM registry.'),
+        placeHolder: localize('registry.url.placeholder', 'https://my-private.registry'),
+        validateInput: (value) => (isWebUri(value) ? null : localize('must.be.url', 'Value must be a valid URL.')),
+        ignoreFocusOut: true,
+    });
 
-    public constructor(private readonly registryProvider: RegistryProvider) {}
+    if (!registry) {
+        return;
+    }
 
-    public async execute(): Promise<void> {
-        const registry = await vscode.window.showInputBox({
-            prompt: localize('registry.url.prompt', 'Enter the URL of the NPM registry.'),
-            placeHolder: localize('registry.url.placeholder', 'https://my-private.registry'),
-            validateInput: (value) => (isWebUri(value) ? null : localize('must.be.url', 'Value must be a valid URL.')),
-            ignoreFocusOut: true,
-        });
+    const name = await vscode.window.showInputBox({
+        prompt: localize('registry.name.prompt', 'Enter a name for the registry: {0}.', registry),
+        placeHolder: localize('registry.name.placeholder', 'Registry name'),
+        ignoreFocusOut: true,
+    });
 
-        if (!registry) {
-            return;
-        }
+    if (!name) {
+        return;
+    }
 
-        const name = await vscode.window.showInputBox({
-            prompt: localize('registry.name.prompt', 'Enter a name for the registry: {0}.', registry),
-            placeHolder: localize('registry.name.placeholder', 'Registry name'),
-            ignoreFocusOut: true,
-        });
+    UserRegistry.addUserRegistry(name, registry);
 
-        if (!name) {
-            return;
-        }
+    const openSettingsJson = localize('open.settings.json', 'Open settings.json');
+    const settingsJsonLink = `[${openSettingsJson}](command:workbench.action.openSettingsJson)`;
 
-        this.registryProvider.addUserRegistry(name, registry);
+    await vscode.window.showInformationMessage(
+        localize(
+            'registry.added',
+            'Registry "{0}" added. {1} and edit "privateExtensions.registries" to configure authentication or other settings.',
+            name,
+            settingsJsonLink,
+        ),
+    );
+}
 
-        const openSettingsJson = localize('open.settings.json', 'Open settings.json');
-        const settingsJsonLink = `[${openSettingsJson}](command:workbench.action.openSettingsJson)`;
+async function showUserRegistryPrompt() {
+    const registries = UserRegistry.getUserRegistryConfig();
 
-        await vscode.window.showInformationMessage(
-            localize(
-                'registry.added',
-                'Registry "{0}" added. {1} and edit "privateExtensions.registries" to configure authentication or other settings.',
-                name,
-                settingsJsonLink,
-            ),
-        );
+    if (registries.length === 0) {
+        void vscode.window.showInformationMessage(localize('no.user.registries', 'There are no user registries.'));
+        return undefined;
+    }
+
+    const items = registries.map(
+        (registry) =>
+            ({
+                label: registry.name,
+                description: registry.registry ?? '',
+            } as vscode.QuickPickItem),
+    );
+
+    const selected = await vscode.window.showQuickPick(items, {
+        placeHolder: localize('select.registry.to.remove', 'Select a registry to remove.'),
+        matchOnDescription: true,
+    });
+
+    if (selected) {
+        return registries.find((registry) => registry.name === selected.label);
+    } else {
+        return undefined;
     }
 }
 
-export class RemoveUserRegistryCommand implements Command {
-    public readonly id = 'privateExtensions.registry.remove';
+export async function RemoveUserRegistryCommand(registry?: Registry): Promise<void> {
+    const registryName = registry?.name ?? (await showUserRegistryPrompt())?.name;
 
-    public constructor(private readonly registryProvider: RegistryProvider) {}
-
-    public async execute(registry?: Registry): Promise<void> {
-        if (!registry) {
-            registry = await this.showUserRegistryPrompt();
-
-            if (!registry) {
-                // User canceled input.
-                return;
-            }
-        }
-
-        this.registryProvider.removeUserRegistry(registry.name);
-
+    if (registryName) {
+        UserRegistry.removeUserRegistry(registryName);
         await vscode.window.showInformationMessage(
-            localize('registry.removed', 'Registry "{0}" removed.', registry.name),
+            localize('registry.removed', 'Registry "{0}" removed.', registryName),
         );
-    }
-
-    private async showUserRegistryPrompt() {
-        const registries = this.registryProvider.getUserRegistries();
-
-        if (registries.length === 0) {
-            void vscode.window.showInformationMessage(localize('no.user.registries', 'There are no user registries.'));
-            return undefined;
-        }
-
-        const items = registries.map(
-            (registry) =>
-                ({
-                    label: registry.name,
-                    description: registry.uri?.toString(),
-                } as vscode.QuickPickItem),
-        );
-
-        const selected = await vscode.window.showQuickPick(items, {
-            placeHolder: localize('select.registry.to.remove', 'Select a registry to remove.'),
-            matchOnDescription: true,
-        });
-
-        if (selected) {
-            return registries.find((registry) => registry.name === selected.label);
-        } else {
-            return undefined;
-        }
     }
 }

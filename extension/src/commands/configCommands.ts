@@ -3,30 +3,21 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { Uri } from 'vscode';
 
-import { Command } from '../commandManager';
 import { ExtensionsConfigurationFilePath, ExtensionsConfigurationInitialContent } from '../extensionsFileTemplate';
 import { pickWorkspaceFolder } from '../workspace';
 
 /**
  * Opens extensions.private.json to the "registries" element.
  */
-export class ConfigureWorkspaceRegistries implements Command {
-    public readonly id = 'privateExtensions.configureWorkspaceRegistries';
-
-    public async execute(): Promise<void> {
-        await openExtensionsFileToElement('registries');
-    }
+export async function ConfigureWorkspaceRegistries(): Promise<void> {
+    await openExtensionsFileToElement('registries');
 }
 
 /**
  * Opens extensions.private.json to the "recommendations" element.
  */
-export class ConfigureRecommendedExtensions implements Command {
-    public readonly id = 'privateExtensions.configureRecommendedExtensions';
-
-    public async execute(): Promise<void> {
-        await openExtensionsFileToElement('recommendations');
-    }
+export async function ConfigureRecommendedExtensions(): Promise<void> {
+    await openExtensionsFileToElement('recommendations');
 }
 
 /**

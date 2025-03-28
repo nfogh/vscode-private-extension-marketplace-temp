@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { CommandManager } from './commandManager';
+import * as ConfigCommands from './commands/configCommands';
 import * as commands from './commands/index';
+import * as RegistryCommands from './commands/registryCommands';
 import { setContext } from './context';
 import { ExtensionInfoService } from './extensionInfo';
 import { ExtensionsFileFeatures } from './extensionsFileFeatures';
@@ -75,9 +77,34 @@ async function handleActivation() {
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     setContext(context);
 
+    // Registry commands
+    context.subscriptions.push(
+        vscode.commands.registerCommand('privateExtensions.registry.add', RegistryCommands.AddUserRegistryCommand),
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'privateExtensions.registry.remove',
+            RegistryCommands.RemoveUserRegistryCommand,
+        ),
+    );
+    // Configuration commands
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'privateExtensions.configureWorkspaceRegistries',
+            ConfigCommands.ConfigureWorkspaceRegistries,
+        ),
+    );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(
+            'privateExtensions.configureRecommendedExtensions',
+            ConfigCommands.ConfigureRecommendedExtensions,
+        ),
+    );
+
     extensionInfo = new ExtensionInfoService();
-    registryProvider = await RegistryProvider.create(extensionInfo);
     context.subscriptions.push(extensionInfo);
+
+    registryProvider = await RegistryProvider.create(extensionInfo);
     context.subscriptions.push(registryProvider);
 
     await handleActivation();
@@ -110,16 +137,8 @@ function registerCommands(
         new commands.SwitchChannelsCommand(registryProvider),
         new commands.CopyExtensionInformationCommand(),
 
-        // Registry commands
-        new commands.AddUserRegistryCommand(registryProvider),
-        new commands.RemoveUserRegistryCommand(registryProvider),
-
         // Tree view commands
         new commands.RefreshCommand(registryView),
-
-        // Configuration commands
-        new commands.ConfigureWorkspaceRegistries(),
-        new commands.ConfigureRecommendedExtensions(),
 
         // Other commands
         new commands.DeleteCacheCommand(),

@@ -10,22 +10,13 @@ import { getLogger } from './logger';
 import { NpmRegistry } from './NpmRegistry';
 import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
-import { decodeType, options } from './typeUtil';
-import { getConfig, readJSON } from './util';
+import { decodeType } from './typeUtil';
+import { getUserRegistryConfig } from './UserRegistry';
+import { UserRegistry } from './UserRegistryTypes';
+import { readJSON } from './util';
 import { VsxRegistry } from './VsxRegistry';
 
 const localize = nls.loadMessageBundle();
-
-const UserRegistry = options(
-    {
-        name: t.string,
-    },
-    {
-        registry: t.string,
-        type: t.union([t.literal('npm'), t.literal('vsx')]),
-    },
-);
-type UserRegistry = t.TypeOf<typeof UserRegistry>;
 
 const ExtensionsConfig = t.partial({
     registries: t.array(UserRegistry),
@@ -164,48 +155,9 @@ export class RegistryProvider implements Disposable {
         return [...results.values()];
     }
 
-    public addUserRegistry(name: string, registry: string): void {
-        const userRegistries = this.getUserRegistryConfig();
-
-        if (userRegistries.some((other) => name === other.name)) {
-            throw new Error(localize('registry.exists', 'A registry named "{0}" already exists', name));
-        }
-
-        userRegistries.push({
-            name,
-            registry,
-        });
-
-        this.setUserRegistryConfig(userRegistries);
-    }
-
-    public removeUserRegistry(name: string): void {
-        const userRegistries = this.getUserRegistryConfig();
-        const newRegistries = userRegistries.filter((registry) => registry.name !== name);
-
-        if (newRegistries.length === userRegistries.length) {
-            throw new Error(localize('registry.does.not.exist', 'No registry named "{0}" exists.', name));
-        }
-
-        this.setUserRegistryConfig(newRegistries);
-    }
-
-    private getUserRegistryConfig(): UserRegistry[] {
-        const userRegistries = decodeType(getConfig().get<any>('registries', []), t.array(UserRegistry));
-
-        if (!userRegistries) {
-            getLogger().log(`Invalid registry configuration in user settings`);
-        }
-        return userRegistries ?? [];
-    }
-
-    private setUserRegistryConfig(registries: readonly UserRegistry[]) {
-        void getConfig().update('registries', registries, vscode.ConfigurationTarget.Global);
-    }
-
-    private async updateUserRegistries(): Promise<Registry[]> {
+    async updateUserRegistries(): Promise<Registry[]> {
         return await Promise.all(
-            this.getUserRegistryConfig().map((registryConfig) =>
+            getUserRegistryConfig().map((registryConfig) =>
                 createRegistry(registryConfig, this.extensionInfo, RegistrySource.User),
             ),
         );
