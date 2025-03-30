@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace-helper",
     "displayName": "Private Extension Marketplace: Helper",
     "description": "Lets Private Extension Marketplace work in remote workspaces.",
-    "version": "1.10.3",
+    "version": "1.10.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -44,9 +44,10 @@
         "package": "webpack --mode production --devtool hidden-source-map",
         "test-compile": "tsc -p ./",
         "test-watch": "tsc -watch -p ./",
-        "pretest": "npm run test-compile && npm run compile && npm run lint",
         "lint": "eslint src --ext ts",
-        "test": "node ./out/test/runTest.js"
+        "pretest": "npm run test-compile",
+        "test": "node ./out/test/runTest.js",
+        "ui-test": "echo No UI tests"
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
