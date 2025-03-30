@@ -19,5 +19,4 @@ steps:
       - npm ci
       - npm run lint
       - xvfb-run npm run test
-      - xvfb-run npm run ui-test
       - npx vsce package

@@ -324,8 +324,7 @@
         "test-watch": "tsc -watch -p ./",
         "lint": "eslint src --ext ts",
         "pretest": "npm run test-compile",
-        "test": "node ./out/test/runTest.js",
-        "ui-test": "npm run pretest && extest setup-and-run './out/ui-test/*.test.js' --code_version max --code_settings settings.json --extensions_dir .test-extensions"
+        "test": "node ./out/test/runTest.js && extest setup-and-run './out/ui-test/*.test.js' --code_version max --code_settings settings.json --extensions_dir .test-extensions"
     },
     "devDependencies": {
         "@types/cacache": "^12.0.1",
