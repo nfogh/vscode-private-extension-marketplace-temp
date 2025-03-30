@@ -25,4 +25,4 @@ steps:
       - npm run deploy
 
 depends_on:
- - build
+  - build

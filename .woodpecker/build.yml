@@ -13,7 +13,7 @@ steps:
   build:
     when:
       event: [push, pull_request]
-    image: node
+    image: nfogh/vscode-ci-test
     commands:
       - cd /woodpecker/git/${EXTENSION}
       - npm ci
