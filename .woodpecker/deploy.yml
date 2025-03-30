@@ -10,14 +10,18 @@ matrix:
     - remote-helper
 
 steps:
-  build:
+  deploy:
     when:
-      event: [push, pull_request]
+      event: tag
     image: node
+    environment:
+      VSCE_PAT:
+        from_secret: vsce_pat
+      OVSX_PAT:
+        from_secret: ovsx_pat
     commands:
       - cd /woodpecker/git/${EXTENSION}
       - npm ci
-      - npm run lint
-      - xvfb-run npm run test
-      - xvfb-run npm run ui-test
-      - npx vsce package
+      - npm run deploy
+
+depends_on: build

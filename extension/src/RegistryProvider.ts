@@ -41,7 +41,7 @@ export class RegistryProvider implements Disposable {
 
     public static async create(extensionInfo: ExtensionInfoService): Promise<RegistryProvider> {
         const registryProvider = new RegistryProvider(extensionInfo);
-        await registryProvider.refresh();
+        void registryProvider.refresh();
         return registryProvider;
     }
 
@@ -311,7 +311,8 @@ async function createRegistry(
             } else {
                 const errorMessage = `Unable to auto-detect registry type for ${options.registry}`;
                 getLogger().log(errorMessage);
-                throw new Error(errorMessage);
+                // Default to NpmRegistry
+                return new NpmRegistry(extensionInfo, name, registrySource, options);
             }
         } else {
             return new NpmRegistry(extensionInfo, name, registrySource, options);

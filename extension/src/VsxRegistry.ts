@@ -95,7 +95,7 @@ export class VsxRegistry implements Registry {
             const fileStream = fs.createWriteStream(filePath);
 
             const data = await fetch(pkg.vsixFile);
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 data.body.pipe(fileStream);
                 data.body.on('error', reject);
                 fileStream.on('finish', resolve);
