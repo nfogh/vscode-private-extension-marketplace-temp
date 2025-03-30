@@ -41,7 +41,7 @@ export class RegistryProvider implements Disposable {
 
     public static async create(extensionInfo: ExtensionInfoService): Promise<RegistryProvider> {
         const registryProvider = new RegistryProvider(extensionInfo);
-        void registryProvider.refresh();
+        await registryProvider.refresh();
         return registryProvider;
     }
 
