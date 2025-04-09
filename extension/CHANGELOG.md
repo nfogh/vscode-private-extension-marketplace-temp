@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.11.0
+
+-   Added: Filesystem registry provider
+
 ## 1.10.3
 
 -   Fixed: Always enable registry add and remove commands

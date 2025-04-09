@@ -109,19 +109,22 @@ export class NpmRegistry implements Registry {
      * another registry.
      */
     public equals(other: Registry): boolean {
-        if (this.enablePagination !== other.enablePagination) {
-            return false;
-        }
+        if (other instanceof NpmRegistry) {
+            if (this.enablePagination !== other.enablePagination) {
+                return false;
+            }
 
-        if (!queryEquals(this.query, other.query)) {
-            return false;
-        }
+            if (!queryEquals(this.query, other.query)) {
+                return false;
+            }
 
-        if (this.uri && other.uri) {
-            return uriEquals(this.uri, other.uri);
-        } else {
-            return this.uri === undefined && other.uri === undefined;
+            if (this.uri && other.uri) {
+                return uriEquals(this.uri, other.uri);
+            } else {
+                return this.uri === undefined && other.uri === undefined;
+            }
         }
+        return false;
     }
 
     /**

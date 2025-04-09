@@ -8,7 +8,7 @@ export const UserRegistry = options(
     },
     {
         registry: t.string,
-        type: t.union([t.literal('npm'), t.literal('vsx')]),
+        type: t.union([t.literal('npm'), t.literal('vsx'), t.literal('file')]),
     },
 );
 export type UserRegistry = t.TypeOf<typeof UserRegistry>;

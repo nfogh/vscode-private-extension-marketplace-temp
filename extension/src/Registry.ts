@@ -44,15 +44,6 @@ export interface RegistryOptions {
     query: string | string[];
 
     /**
-     * If true, keep requesting more package results from the registry until it
-     * gives an empty response. If false, make only one request.
-     *
-     * This defaults to true. Set it to false when using a server that doesn't
-     * properly handle the "from" parameter of the NPM search API.
-     */
-    enablePagination: boolean;
-
-    /**
      * Number of results to limit each query to when requesting package results.
      *
      * Default: 20
@@ -69,8 +60,6 @@ export interface VersionInfo {
  * Represents a registry.
  */
 export interface Registry {
-    readonly query: string | string[];
-    readonly enablePagination: boolean;
     readonly extensionInfo: ExtensionInfoService;
     readonly name: string;
     readonly source: RegistrySource;
@@ -122,7 +111,7 @@ export interface Registry {
      * Gets whether this registry has the same Uri and filtering options as
      * another registry.
      */
-    equals(other: Registry): boolean;
+    equals(other: any): boolean;
 }
 
 /**

@@ -24,7 +24,8 @@
                         "type": "string",
                         "enum": [
                             "npm",
-                            "vsx"
+                            "vsx",
+                            "file"
                         ]
                     },
                     "query": {

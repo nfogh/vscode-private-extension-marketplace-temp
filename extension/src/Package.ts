@@ -58,6 +58,11 @@ function error(message: string): ResultError {
     return { type: 'error', error: new Error(message) };
 }
 
+const RepositoryType = t.type({
+    type: t.string,
+    url: t.string,
+});
+
 /**
  * Fields expected for all NPM packages.
  */
@@ -72,7 +77,7 @@ const PackageManifest = options(
         version: t.string,
         downloads: t.number,
         rating: t.number,
-        repository: t.string,
+        repository: t.union([t.string, RepositoryType]),
         files: t.array(t.string),
         osSpecificVsix: t.record(t.string, t.string),
     },
@@ -135,7 +140,7 @@ export class Package {
 
         this.downloads = manifest.downloads;
         this.rating = manifest.rating;
-        this.repository = manifest.repository;
+        this.repository = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository?.url;
 
         // VS Code uses case-insensitive comparison to match extension IDs.
         // Match that behavior by normalizing everything to lowercase.
