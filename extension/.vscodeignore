@@ -11,6 +11,7 @@ node_modules
 # Ignore test output
 .vscode-test/**
 out/**
+.test-extensions
 
 # Ignore vsce output
 *.vsix
@@ -22,6 +23,7 @@ tsconfig.json
 tslint.json
 webpack.config.js
 **/*.map
+.vscode-test.js
 
 # Ignore i18n language files
 i18n/**

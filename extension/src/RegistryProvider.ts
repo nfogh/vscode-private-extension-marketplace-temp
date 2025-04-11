@@ -6,6 +6,7 @@ import { Disposable, EventEmitter } from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from './extensionInfo';
+import { FileRegistry } from './FileRegistry';
 import { getLogger } from './logger';
 import { NpmRegistry } from './NpmRegistry';
 import { Package } from './Package';
@@ -298,6 +299,8 @@ async function createRegistry(
     if (type) {
         if (type === 'vsx') {
             return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+        } else if (type === 'file' && options.registry !== undefined) {
+            return new FileRegistry(extensionInfo, name, options.registry, options.query ?? '*');
         } else {
             return new NpmRegistry(extensionInfo, name, registrySource, options);
         }
@@ -308,10 +311,13 @@ async function createRegistry(
                 return new NpmRegistry(extensionInfo, name, registrySource, options);
             } else if (await VsxRegistry.isRegistry(options.registry)) {
                 return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+            } else if ((await FileRegistry.isRegistry(options.registry)) && options.registry) {
+                return new FileRegistry(extensionInfo, name, options.registry, options.query ?? '*');
             } else {
                 const errorMessage = `Unable to auto-detect registry type for ${options.registry}`;
                 getLogger().log(errorMessage);
-                throw new Error(errorMessage);
+                // Default to NpmRegistry
+                return new NpmRegistry(extensionInfo, name, registrySource, options);
             }
         } else {
             return new NpmRegistry(extensionInfo, name, registrySource, options);

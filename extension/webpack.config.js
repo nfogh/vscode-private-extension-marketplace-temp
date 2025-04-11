@@ -12,7 +12,7 @@ const NormalModuleReplacementPlugin = require('webpack').NormalModuleReplacement
 const LicensePlugin = require('webpack-license-plugin');
 
 // See https://spdx.org/licenses/
-const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL', 'WTFPL OR ISC', 'BlueOak-1.0.0'];
+const allowedLicenses = ['Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-3.0', 'CC0-1.0', 'ISC', 'MIT', 'WTFPL', 'WTFPL OR ISC', 'BlueOak-1.0.0', '(MIT OR GPL-3.0-or-later)', '(MIT AND Zlib)'];
 
 /** @type {import('webpack').Configuration} */
 const extensionConfig = {

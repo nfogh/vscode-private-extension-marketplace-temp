@@ -10,13 +10,19 @@ matrix:
     - remote-helper
 
 steps:
-  build:
+  deploy:
     when:
-      event: [push, pull_request]
-    image: nfogh/vscode-ci-test
+      event: tag
+    image: node
+    environment:
+      VSCE_PAT:
+        from_secret: vsce_pat
+      OVSX_PAT:
+        from_secret: ovsx_pat
     commands:
       - cd /woodpecker/git/${EXTENSION}
       - npm ci
-      - npm run lint
-      - xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' npm run test
-      - npx vsce package
+      - npm run deploy
+
+depends_on:
+  - build

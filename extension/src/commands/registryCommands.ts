@@ -1,4 +1,3 @@
-import { isWebUri } from 'valid-url';
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
@@ -11,7 +10,6 @@ export async function AddUserRegistryCommand(): Promise<void> {
     const registry = await vscode.window.showInputBox({
         prompt: localize('registry.url.prompt', 'Enter the URL of the NPM registry.'),
         placeHolder: localize('registry.url.placeholder', 'https://my-private.registry'),
-        validateInput: (value) => (isWebUri(value) ? null : localize('must.be.url', 'Value must be a valid URL.')),
         ignoreFocusOut: true,
     });
 

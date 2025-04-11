@@ -95,7 +95,7 @@ export class VsxRegistry implements Registry {
             const fileStream = fs.createWriteStream(filePath);
 
             const data = await fetch(pkg.vsixFile);
-            await new Promise((resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 data.body.pipe(fileStream);
                 data.body.on('error', reject);
                 fileStream.on('finish', resolve);
@@ -105,9 +105,7 @@ export class VsxRegistry implements Registry {
         const extractedPath = filePath + '-extracted';
 
         if (!(await pathAccessible(extractedPath))) {
-            await new Promise((resolve, reject) => {
-                decompress(filePath, extractedPath).then(resolve).catch(reject);
-            });
+            await decompress(filePath, extractedPath);
 
             // Copy the vsix file to be compatible with the NPM registry.
             // TODO: Refactor logic to avoid copying the file.
@@ -248,7 +246,10 @@ export class VsxRegistry implements Registry {
      * Gets whether this registry has the same Uri and filtering options as
      * another registry.
      */
-    equals(other: Registry): boolean {
-        return other.query === this.query && other.uri?.toString() === this.uri?.toString();
+    equals(other: any): boolean {
+        if (other instanceof VsxRegistry) {
+            return other.query === this.query && other.uri?.toString() === this.uri?.toString();
+        }
+        return false;
     }
 }

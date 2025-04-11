@@ -6,20 +6,113 @@
 [![License](https://img.shields.io/badge/License-Apache-cyan)](https://opensource.org/licenses/Apache-2.0)
 [![Gitea Last Commit](https://img.shields.io/gitea/last-commit/nfogh/vscode-private-extension-marketplace?gitea_url=https%3A%2F%2Fcodeberg.org)](https://codeberg.org/nfogh/vscode-private-extension-marketplace/src/branch/main/extension)
 
-Private Extension Marketplace lets you find, install, and update extensions from any
-NPM or VSX registry. This lets you distribute organization-specific extensions using a
-private NPM registry server such as [Sonatype Nexus](https://www.sonatype.com/product-nexus-repository)
-or [Verdaccio](https://verdaccio.org). Or using an [OpenVSX](https://github.com/eclipse/openvsx) instance.
+Private Extension Marketplace attempts to give the same look-and-feel as the
+regular vscode marketplace, but supports other extension sources for private
+extensions.
+
+It lets you find, install, and update extensions from a filesystem, or an NPM or VSX
+registry. This lets you distribute  organization-specific extensions either using
+a simple file share or a private NPM registry server such as
+[Sonatype Nexus](https://www.sonatype.com/product-nexus-repository) or
+[Verdaccio](https://verdaccio.org). Or using an
+[OpenVSX](https://github.com/eclipse/openvsx) instance.
 
 # Setup
 
-To use the private extension marketplace, you need to open a workspace which contains 
-a .vscode/extensions.private.json file. Or you need to add a private extension repository
-in your user settings. See the section [Workspace Configuration](#workspace-configuration) for instructions.
+To use the private extension marketplace, you need to open a workspace which
+contains a .vscode/extensions.private.json file. Or you need to add a private
+extension repository in your user settings.
+
+### Workspace Configuration
+
+Create a file named `.vscode/extensions.private.json` in any workspace folder
+to define your private extension registries and any recommended extensions.
+You can use the **Private Extensions: Configure Recommended Extensions** or
+**Private Extensions: Configure Workspace Registries** commands to open this
+file, creating it from a template if it does not already exist.
+
+The file has the following structure:
+
+```JSON
+{
+    "registries": [
+        {
+            "name": "My Private Registry",
+            "registry": "https://my-private.registry"
+        }
+    ],
+    "recommendations": [
+        "garmin.example-extension"
+    ]
+}
+```
+
+The private extension marketplace will try to autodetect which kind of repository
+it is communicating with (file, npm or openvsx). If this somehow fails, you can force
+the type of registry by explicitly setting the type to either "file", "npm" or "vsx" like
+so:
+
+```JSON
+{
+    "registries": [
+        {
+            "name": "My Private Registry",
+            "registry": "https://my-private.registry",
+            "type": "npm"
+        }
+    ]
+}
+```
+
+The `registries` array defines one or more registries to search for private
+extensions. Each item supports the following fields:
+
+-   **name**: Name to display for the registry.
+-   **registry**: The address of the registry which contains the extension packages.
+    - For **file** registry types, it should contain the directory .vsix files are stored in.
+    - For **vsx** or **npm** registry types, it should contain the URL of the registry. If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc),
+    or in the case of a VSX registry, it will use [OpenVSX](https://open-vsx.org/)
+-   **query**: (Optional) Display only packages that match this search query. 
+    For NPM registries, the [search query](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search)
+    is either an array of search terms or a string with space-delimited terms.
+    For example, `"keywords:group1 keywords:group2"` would display only packages
+    that have the either of the keywords `group1` or `group2`.
+-   **enablePagination**: (Optional) If `true`, keep requesting more package results from the registry
+    until it gives an empty response. If `false`, make only one request. This defaults to `true`.
+    Set it to false when using a server that doesn't properly handle the `from` parameter of the NPM search API.
+    You may also need to increase `limit` to get all results if this is disabled.
+-   **limit**: (Optional) Number of results to limit each query to when requesting package results. Default: 100.
+-   **type**: (Optional) The type of the repository. Can be `npm`, `vsx` or `file`. If not given, it will be autodetected depending on the registry field.
+-   If the type is npm, any options supported by [npm-registry-fetch](https://github.com/npm/npm-registry-fetch#-fetch-options) can be added.
+    Use these if you need to set authentication, a proxy, or other options.
+
+The `recommendations` array is an optional list of private extensions from any
+of the registries which should be recommended for users of the workspace.
+The identifier of an extension is always `"${publisher}.${name}"`.
+For example: `"garmin.private-extension-manager"`.
+
+You may have multiple workspace folders that contain an `extensions.private.json`
+file. The extension manager will display the registries and recommendations from
+all of them.
+
+**Note:** if the `query` option is omitted, the query text will be a single
+asterisk for NPM servers. Some registry servers such as Verdaccio do not respond
+to this with all available packages, so you may need to set `query` to get any
+results at all.
+
+### User Configuration
+
+Each user may also specify registries to use regardless of which workspace is
+open with the `privateExtensions.registries` setting. This has the same format
+as the `registries` array in `extensions.private.json`.
+
+You can use the **Private Extensions: Add Registry...** and
+**Private Extensions: Remove Registry** commands to quickly edit this setting.
 
 # Usage
 
-Select the **Private Extensions** icon on the activity bar:
+Once a valid registry has been configured, a **Private Extensions** icon will
+appear on the activity bar:
 
 ![Activity Bar Icon](https://raw.githubusercontent.com/joelspadin-garmin/vscode-private-extension-manager/master/extension/media/readme/activity-bar.png)
 
@@ -124,102 +217,6 @@ unsupported platforms.
 
 For Open VSX repositories, follow the guides found in the [Open VSX pages](https://github.com/eclipse/openvsx/wiki/Deploying-Open-VSX) to install an OpenVSX server. Then point to
 the URL of your OpenVSX server in the "registry" part of
-
-## Discovering Extensions
-
-Now that your extensions are published to an NPM or OpenVSX registry, you need to tell
-Private Extension Marketplace how to find them. This can be done using a workspace
-config file and/or a user setting.
-
-### Workspace Configuration
-
-Private Extension Marketplace uses a config file similar to Visual Studio Code's
-`extensions.json` to allow workspaces to recommend extensions. Create a file
-named `.vscode/extensions.private.json` in any workspace folder to define your
-private extension registries and any recommended extensions. You can use the
-**Private Extensions: Configure Recommended Extensions** or
-**Private Extensions: Configure Workspace Registries** commands to open this
-file, creating it from a template if it does not already exist.
-
-The file has the following structure:
-
-```JSON
-{
-    "registries": [
-        {
-            "name": "My Private Registry",
-            "registry": "https://my-private.registry"
-        }
-    ],
-    "recommendations": [
-        "garmin.example-extension"
-    ]
-}
-```
-
-The private extension marketplace will try to autodetect which kind of repository
-it is communicating with (npm or openvsx). If this somehow fails, you can force
-the type of registry by explicitly setting the type to either "npm" or "vsx" like
-so:
-
-```JSON
-{
-    "registries": [
-        {
-            "name": "My Private Registry",
-            "registry": "https://my-private.registry",
-            "type": "npm"
-        }
-    ],
-    "recommendations": [
-        "garmin.example-extension"
-    ]
-}
-```
-
-The `registries` array defines one or more registries to search for private
-extensions. Each item supports the following fields:
-
--   **name**: Name to display for the registry.
--   **registry**: (Optional) The address of the registry which contains the extension packages.
-    If omitted, the registry is determined according to standard [NPM config files](https://docs.npmjs.com/files/npmrc),
-    or in the case of a VSX registry, it will use [OpenVSX](https://open-vsx.org/)
--   **query**: (Optional) Display only packages that match this search query. 
-    For NPM registries, the [search query](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#get-v1search)
-    is either an array of search terms or a string with space-delimited terms.
-    For example, `"keywords:group1 keywords:group2"` would display only packages
-    that have the either of the keywords `group1` or `group2`.
--   **enablePagination**: (Optional) If `true`, keep requesting more package results from the registry
-    until it gives an empty response. If `false`, make only one request. This defaults to `true`.
-    Set it to false when using a server that doesn't properly handle the `from` parameter of the NPM search API.
-    You may also need to increase `limit` to get all results if this is disabled.
--   **limit**: (Optional) Number of results to limit each query to when requesting package results. Default: 100.
--   **type**: (Optional) The type of the repository. Can be `npm` or `vsx`. If not given, it will be autodetected.
--   If the type is npm, any options supported by [npm-registry-fetch](https://github.com/npm/npm-registry-fetch#-fetch-options).
-    Use these if you need to set authentication, a proxy, or other options.
-
-The `recommendations` array is an optional list of private extensions from any
-of the registries which should be recommended for users of the workspace.
-The identifier of an extension is always `"${publisher}.${name}"`.
-For example: `"garmin.private-extension-manager"`.
-
-You may have multiple workspace folders that contain an `extensions.private.json`
-file. The extension manager will display the registries and recommendations from
-all of them.
-
-**Note:** if the `query` option is omitted, the query text will be a single
-asterisk for NPM servers. Some registry servers such as Verdaccio do not respond
-to this with all available packages, so you may need to set `query` to get any
-results at all.
-
-### User Configuration
-
-Each user may also specify registries to use regardless of which workspace is
-open with the `privateExtensions.registries` setting. This has the same format
-as the `registries` array in `extensions.private.json`.
-
-You can use the **Private Extensions: Add Registry...** and
-**Private Extensions: Remove Registry** commands to quickly edit this setting.
 
 ### Custom Channels
 
