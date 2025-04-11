@@ -47,11 +47,10 @@ async function getAllManifests(
             cancellationToken,
         )
     ).map((uri) => uri.fsPath);
-    const sortedPackageFiles = packageFiles.sort((a, b) => b.localeCompare(a));
 
     return (
         await Promise.all(
-            sortedPackageFiles.map(async (packagePath) => {
+            packageFiles.map(async (packagePath) => {
                 try {
                     const manifest = await getManifest(packagePath, manifestCache);
                     manifest.files = [packagePath];
@@ -64,7 +63,9 @@ async function getAllManifests(
                 }
             }),
         )
-    ).filter((manifest) => manifest !== undefined);
+    )
+        .filter((manifest) => manifest !== undefined)
+        .sort((a, b) => new SemVer(a.manifest.version).compare(new SemVer(b.manifest.version)));
 }
 
 export class FileRegistry implements Registry {
@@ -127,6 +128,7 @@ export class FileRegistry implements Registry {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache, cancellationToken);
 
         const packages: Package[] = manifests.map((pkg) => new Package(this, pkg.manifest));
+        packages.sort((a, b) => -a.version.compare(b.version));
 
         const uniquePackages = packages.filter(
             (pkg, i, packages) => packages.findIndex((otherPkg) => otherPkg.name === pkg.name) === i,
@@ -144,7 +146,7 @@ export class FileRegistry implements Registry {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache);
         const matchingManifests = manifests.filter((manifest) => manifest.manifest.name === name);
         const versions = matchingManifests.map((manifest) => ({ version: new SemVer(manifest.manifest.version) }));
-        return versions.sort((a, b) => (a.version > b.version ? 1 : -1));
+        return versions.sort((a, b) => a.version.compare(b.version));
     }
 
     async getPackage(name: string, version?: string): Promise<Package> {
@@ -152,7 +154,7 @@ export class FileRegistry implements Registry {
         const matchingManifests = manifests.filter(
             (manifest) => manifest.manifest.name === name && (!version || manifest.manifest.version === version),
         );
-        matchingManifests.sort((a, b) => (new SemVer(a.manifest.version) > new SemVer(b.manifest.version) ? 1 : -1));
+        matchingManifests.sort((a, b) => new SemVer(a.manifest.version).compare(new SemVer(b.manifest.version)));
         if (matchingManifests.length === 0) {
             throw new VersionMissingError(name, version ?? 'latest');
         }
