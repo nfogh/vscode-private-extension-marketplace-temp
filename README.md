@@ -1,18 +1,19 @@
 # Private Extension Marketplace for Visual Studio Code
 
-[![Build status](https://ci.codeberg.org/api/badges/14375/status.svg)](https://ci.codeberg.org/repos/14375)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
-[![Marketplace Downloads](https://img.shields.io/visual-studio-marketplace/d/NikolajFogh.private-extension-marketplace?label=VS%20Marketplace)](https://marketplace.visualstudio.com/items?itemName=NikolajFogh.private-extension-marketplace)
-[![Open VSX Downloads](https://img.shields.io/open-vsx/dt/NikolajFogh/private-extension-marketplace?label=Open%20VSX)](https://open-vsx.org/extension/NikolajFogh/private-extension-marketplace)
+Extensions are what makes VS Code a great editor. The 
+[VS Code Marketplace](https://marketplace.visualstudio.com/) and
+[OpenVSX.org](https://open-vsx.org/) makes it easy to install and update
+extensions. However, organization-specific extensions often cannot be 
+published on these marketplaces.
 
-Private Extension Marketplace is a Visual Studio Code extension that lets you find,
-install, and update extensions from any NPM registry or OpenVSX instance. This lets
-you distribute organization-specific extensions using a private registry server such as
-[Sonatype Nexus](https://www.sonatype.com/product-nexus-repository),
-[Verdaccio](https://verdaccio.org) or [OpenVSX](https://github.com/eclipse/openvsx).
+This extension tries to solve this problem by letting you distribute
+organization-specific extensions either using a file share or a private
+[NPM registry](https://verdaccio.org) or 
+[OpenVSX server](https://github.com/eclipse/openvsx). It attempts to give the
+same look-and-feel as the regular vscode marketplace.
 
-The `extension` folder contains the main extension.
-See its [README](extension/README.md) for more details.
+The `extension` folder contains the main extension. See its
+[README](extension/README.md) for more details.
 
 The `remote-helper` folder contains a helper extension that lets the main
 extension work properly when in a remote workspace.

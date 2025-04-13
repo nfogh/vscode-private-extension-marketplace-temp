@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.11.1
+
+-   Fixed: Don't validate URL input now we can have filesystem paths as input
+-   Fixed: Sorting of packages in filesystem provider
+-   Updated: Better wording in Readme.md
+-   Fixed: Synced Readme.md in root folder with the one in extension
+
 ## 1.11.0
 
 -   Added: Filesystem registry provider

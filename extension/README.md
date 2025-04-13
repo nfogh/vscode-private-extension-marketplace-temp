@@ -6,16 +6,17 @@
 [![License](https://img.shields.io/badge/License-Apache-cyan)](https://opensource.org/licenses/Apache-2.0)
 [![Gitea Last Commit](https://img.shields.io/gitea/last-commit/nfogh/vscode-private-extension-marketplace?gitea_url=https%3A%2F%2Fcodeberg.org)](https://codeberg.org/nfogh/vscode-private-extension-marketplace/src/branch/main/extension)
 
-Private Extension Marketplace attempts to give the same look-and-feel as the
-regular vscode marketplace, but supports other extension sources for private
-extensions.
+Extensions are what makes VS Code a great editor. The 
+[VS Code Marketplace](https://marketplace.visualstudio.com/) and
+[OpenVSX.org](https://open-vsx.org/) makes it easy to install and update
+extensions. However, organization-specific extensions often cannot be 
+published on these marketplaces.
 
-It lets you find, install, and update extensions from a filesystem, or an NPM or VSX
-registry. This lets you distribute  organization-specific extensions either using
-a simple file share or a private NPM registry server such as
-[Sonatype Nexus](https://www.sonatype.com/product-nexus-repository) or
-[Verdaccio](https://verdaccio.org). Or using an
-[OpenVSX](https://github.com/eclipse/openvsx) instance.
+This extension tries to solve this problem by letting you distribute
+organization-specific extensions either using a file share or a private
+[NPM registry](https://verdaccio.org) or 
+[OpenVSX server](https://github.com/eclipse/openvsx). It attempts to give the
+same look-and-feel as the regular vscode marketplace.
 
 # Setup
 
