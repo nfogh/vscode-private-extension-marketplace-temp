@@ -60,6 +60,7 @@ export interface VersionInfo {
  * Represents a registry.
  */
 export interface Registry {
+    type: 'Registry';
     readonly extensionInfo: ExtensionInfoService;
     readonly name: string;
     readonly source: RegistrySource;
@@ -122,4 +123,8 @@ export function compare(a: Registry, b: Registry): number {
     const nameB = b.name.toUpperCase();
 
     return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+}
+
+export function implementsRegistry(a: any): a is Registry {
+    return a.type === 'Registry';
 }

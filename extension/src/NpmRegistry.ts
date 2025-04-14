@@ -14,6 +14,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { getLogger } from './logger';
+import { NpmPackage } from './NpmPackage';
 import { Package } from './Package';
 import { Registry, RegistrySource, VersionMissingError, RegistryOptions, VersionInfo } from './Registry';
 import { getReleaseChannel, LATEST } from './releaseChannel';
@@ -63,6 +64,7 @@ function isEmptyJson(json: any): boolean {
  * Represents an NPM registry.
  */
 export class NpmRegistry implements Registry {
+    public type: 'Registry' = 'Registry';
     public readonly query: string | string[];
     public readonly enablePagination: boolean;
 
@@ -134,7 +136,7 @@ export class NpmRegistry implements Registry {
      * @param packageOrSpec A package to download, or an NPM package specifier.
      */
     public async downloadPackage(packageOrSpec: Package | string): Promise<Uri> {
-        const spec = packageOrSpec instanceof Package ? packageOrSpec.spec : packageOrSpec;
+        const spec = typeof packageOrSpec === 'string' ? packageOrSpec : packageOrSpec.spec;
 
         const registryDir = sanitize(this.options.registry ?? this.name);
         const dest = path.join(getNpmDownloadDir(), registryDir, spec);
@@ -272,7 +274,7 @@ export class NpmRegistry implements Registry {
             localize('package.not.an.extension', 'Package {0} is not an extension', manifest.name),
             NotAnExtensionError,
         );
-        return new Package(this, manifest, version);
+        return new NpmPackage(this, manifest, version);
     }
 
     private async *findMatchingPackages(query: string | readonly string[], token?: CancellationToken) {

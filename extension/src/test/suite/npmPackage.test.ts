@@ -7,8 +7,9 @@ import 'source-map-support/register';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
+import { NpmPackage } from '../../NpmPackage';
 import { NpmRegistry } from '../../NpmRegistry';
-import { Package, PackageState } from '../../Package';
+import { PackageState } from '../../Package';
 import { RegistrySource } from '../../Registry';
 import { CommonStubs, stubGlobalConfiguration, stubRemoteName } from '../stubs';
 
@@ -46,7 +47,7 @@ suite('Package', function () {
         stubs.stubExtension('test.test-package');
 
         const registry = getDummyRegistry();
-        const pkg = new Package(registry, {
+        const pkg = new NpmPackage(registry, {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -73,7 +74,7 @@ suite('Package', function () {
     test('Available: no remote', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -94,7 +95,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -115,7 +116,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -136,7 +137,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -158,7 +159,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -180,7 +181,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -206,7 +207,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -231,7 +232,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -256,7 +257,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -282,7 +283,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -308,7 +309,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -328,7 +329,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -346,7 +347,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -367,7 +368,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -388,7 +389,7 @@ suite('Package', function () {
         stubRemoteName('test-remote');
         stubs.stubLocalExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -408,7 +409,7 @@ suite('Package', function () {
     test('Available: pre-release', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(
+        const pkg = new NpmPackage(
             getDummyRegistry(),
             {
                 name: 'test-package',
@@ -436,7 +437,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -461,7 +462,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -487,7 +488,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -512,7 +513,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(
+        const pkg = new NpmPackage(
             getDummyRegistry(),
             {
                 name: 'test-package',
@@ -540,7 +541,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -565,7 +566,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -590,7 +591,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -614,7 +615,7 @@ suite('Package', function () {
             },
         });
 
-        const pkg = new Package(
+        const pkg = new NpmPackage(
             getDummyRegistry(),
             {
                 name: 'test-package',
@@ -638,7 +639,7 @@ suite('Package', function () {
     test('Missing publisher', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             version: '1.2.3',
             engines: { vscode: '1.38.0' },
@@ -656,7 +657,7 @@ suite('Package', function () {
     test('Missing .vsix file', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -674,7 +675,7 @@ suite('Package', function () {
     test('Invalid manifest: missing name', async function () {
         assert.throws(
             () => {
-                new Package(getDummyRegistry(), {
+                new NpmPackage(getDummyRegistry(), {
                     publisher: 'Test',
                     version: '1.2.3',
                     engines: { vscode: '1.38.0' },
@@ -689,7 +690,7 @@ suite('Package', function () {
     test('Invalid manifest: wrong name type', async function () {
         assert.throws(
             () => {
-                new Package(getDummyRegistry(), {
+                new NpmPackage(getDummyRegistry(), {
                     name: 42,
                     engines: { vscode: '1.38.0' },
                 });
@@ -702,7 +703,7 @@ suite('Package', function () {
     test('Invalid manifest: wrong displayName type', async function () {
         assert.throws(
             () => {
-                new Package(getDummyRegistry(), {
+                new NpmPackage(getDummyRegistry(), {
                     name: 'test-package',
                     displayName: 42,
                     engines: { vscode: '1.38.0' },
@@ -716,7 +717,7 @@ suite('Package', function () {
     test('Invalid manifest: wrong publisher type', async function () {
         assert.throws(
             () => {
-                new Package(getDummyRegistry(), {
+                new NpmPackage(getDummyRegistry(), {
                     name: 'test-package',
                     publisher: 42,
                     engines: { vscode: '1.38.0' },
@@ -730,7 +731,7 @@ suite('Package', function () {
     test('Invalid manifest: wrong files type', async function () {
         assert.throws(
             () => {
-                new Package(getDummyRegistry(), {
+                new NpmPackage(getDummyRegistry(), {
                     name: 'test-package',
                     files: ['foo.bar', 42],
                     engines: { vscode: '1.38.0' },
@@ -744,7 +745,7 @@ suite('Package', function () {
     test('Vsix file: No OS specific setting', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -759,7 +760,7 @@ suite('Package', function () {
         stubs.stubExtension('test.test-package');
 
         const expectedPlatform = os.platform();
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -777,7 +778,7 @@ suite('Package', function () {
     test('Vsix file: OS specific setting but no supported OS', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -798,7 +799,7 @@ suite('Package', function () {
     test('Vsix file: Empty OS specific setting', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',
@@ -813,7 +814,7 @@ suite('Package', function () {
     test('Vsix file: Default if no matching OS', async function () {
         stubs.stubExtension('test.test-package');
 
-        const pkg = new Package(getDummyRegistry(), {
+        const pkg = new NpmPackage(getDummyRegistry(), {
             name: 'test-package',
             publisher: 'Test',
             version: '1.2.3',

@@ -6,6 +6,7 @@ import { SemVer } from 'semver';
 import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from './extensionInfo';
+import { NpmPackage } from './NpmPackage';
 import { Package } from './Package';
 import { Registry, RegistrySource, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
@@ -69,6 +70,7 @@ async function getAllManifests(
 }
 
 export class FileRegistry implements Registry {
+    public type: 'Registry' = 'Registry';
     readonly query: string;
     readonly extensionInfo: ExtensionInfoService;
     readonly name: string;
@@ -94,7 +96,7 @@ export class FileRegistry implements Registry {
     }
 
     async downloadPackage(packageOrSpec: Package | string): Promise<vscode.Uri> {
-        const spec = packageOrSpec instanceof Package ? packageOrSpec.spec : packageOrSpec;
+        const spec = typeof packageOrSpec === 'string' ? packageOrSpec : packageOrSpec.spec;
         const [name, version] = spec.split('@');
         const pkg = await this.getPackage(name, version);
 
@@ -127,7 +129,7 @@ export class FileRegistry implements Registry {
     async getPackages(cancellationToken?: vscode.CancellationToken): Promise<Package[]> {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache, cancellationToken);
 
-        const packages: Package[] = manifests.map((pkg) => new Package(this, pkg.manifest));
+        const packages: Package[] = manifests.map((pkg) => new NpmPackage(this, pkg.manifest));
         packages.sort((a, b) => -a.version.compare(b.version));
 
         const uniquePackages = packages.filter(
@@ -159,7 +161,7 @@ export class FileRegistry implements Registry {
             throw new VersionMissingError(name, version ?? 'latest');
         }
 
-        const pkg = new Package(this, matchingManifests[0].manifest);
+        const pkg = new NpmPackage(this, matchingManifests[0].manifest);
         await pkg.updateState();
         return pkg;
     }

@@ -13,6 +13,7 @@ import { getLogger } from './logger';
 import { Package } from './Package';
 import { Registry, RegistrySource, RegistryOptions, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
+import { VsxPackage } from './VsxPackage';
 import {
     SearchResult,
     SearchResultRT,
@@ -35,6 +36,7 @@ async function pathAccessible(path: string) {
  * Represents a registry.
  */
 export class VsxRegistry implements Registry {
+    public type: 'Registry' = 'Registry';
     readonly query: string | string[];
     readonly enablePagination: boolean;
     readonly extensionInfo: ExtensionInfoService;
@@ -80,7 +82,7 @@ export class VsxRegistry implements Registry {
      * @param packageOrSpec A package to download, or an NPM package specifier.
      */
     async downloadPackage(packageOrSpec: Package | string): Promise<Uri> {
-        const spec = packageOrSpec instanceof Package ? packageOrSpec.spec : packageOrSpec;
+        const spec = typeof packageOrSpec === 'string' ? packageOrSpec : packageOrSpec.spec;
         const [name, version] = spec.split('@');
         const pkg = await this.getPackage(name, version);
 
@@ -144,7 +146,7 @@ export class VsxRegistry implements Registry {
 
             const page = typedResult.extensions.map(
                 (extension) =>
-                    new Package(this, {
+                    new VsxPackage(this, {
                         name: extension.name,
                         version: extension.version,
                         displayName: extension.displayName,
@@ -239,7 +241,7 @@ export class VsxRegistry implements Registry {
             repository: extension.repository,
             files: extension.files ? Object.values(extension.files) : [],
         };
-        return new Package(this, packageInfo);
+        return new VsxPackage(this, packageInfo);
     }
 
     /**

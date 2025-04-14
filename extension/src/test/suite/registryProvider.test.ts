@@ -108,7 +108,7 @@ suite('Registry Provider', async function () {
         const provider = await RegistryProvider.create(extensionInfo);
 
         const packages = await provider.getUniquePackages();
-        packages.sort(Package.compare);
+        packages.sort((a, b) => a.compare(b));
 
         const expected = [
             EXPECT_PACKAGE.recommended1,
@@ -126,7 +126,7 @@ suite('Registry Provider', async function () {
 
         const provider = await RegistryProvider.create(extensionInfo);
         const packages = await provider.getUniquePackages();
-        packages.sort(Package.compare);
+        packages.sort((a, b) => a.compare(b));
 
         const expected = [
             EXPECT_PACKAGE.recommended1,

@@ -6,7 +6,7 @@ import { Command } from '../commandManager';
 import { ExtensionInfoService } from '../extensionInfo';
 import { findPackage, getPackageChannels, getPackageVersions } from '../findPackage';
 import * as install from '../install';
-import { Package } from '../Package';
+import { implementsPackage, Package } from '../Package';
 import { RegistryProvider } from '../RegistryProvider';
 import { setReleaseChannel } from '../releaseChannel';
 import { RegistryView } from '../views/registryView';
@@ -303,8 +303,12 @@ export class CopyExtensionInformationCommand implements Command {
  * Gets the latest package for an extension.
  * @param channel Release channel to track. If omitted, returns the latest version for the user's selected release channel.
  */
-async function getLatestPackage(registryProvider: RegistryProvider, extensionOrId: Package | string, channel?: string) {
-    return extensionOrId instanceof Package
+async function getLatestPackage(
+    registryProvider: RegistryProvider,
+    extensionOrId: Package | string,
+    channel?: string,
+): Promise<Package> {
+    return implementsPackage(extensionOrId)
         ? extensionOrId
         : await findPackage(registryProvider, extensionOrId, channel);
 }
@@ -313,15 +317,15 @@ async function getLatestPackage(registryProvider: RegistryProvider, extensionOrI
  * Installs an extension given a package or the extension ID and a registry provider to search.
  * @returns the Package for the installed extension.
  */
-function installExtension(provider: RegistryProvider, extensionOrId: Package | string) {
-    if (extensionOrId instanceof Package) {
+function installExtension(provider: RegistryProvider, extensionOrId: Package | string): Promise<Package> {
+    if (implementsPackage(extensionOrId)) {
         return install.installExtension(extensionOrId);
     } else {
         return install.installExtension(provider, extensionOrId);
     }
 }
 
-async function showInstallReloadPrompt(pkg: Package) {
+async function showInstallReloadPrompt(pkg: Package): Promise<void> {
     return await install.showReloadPrompt(
         localize(
             'reload.to.complete.install',

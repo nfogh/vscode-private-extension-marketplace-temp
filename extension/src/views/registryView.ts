@@ -4,8 +4,8 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../extensionInfo';
 import { getLogger } from '../logger';
-import { Package, PackageState } from '../Package';
-import { Registry } from '../Registry';
+import { implementsPackage, Package, PackageState } from '../Package';
+import { implementsRegistry, Registry } from '../Registry';
 import * as registry from '../Registry';
 import { RegistryProvider } from '../RegistryProvider';
 
@@ -256,7 +256,7 @@ class RegistryItem extends BaseItem {
     public async getExtensions() {
         try {
             const children = await this.registry.getPackages();
-            children.sort(Package.compare);
+            children.sort((a, b) => a.compare(b));
             return children;
         } catch (error) {
             getLogger().log(`Unable to get extensions from ${this.registry.name} (${this.registry.uri}) ${error}`);
@@ -309,11 +309,11 @@ class ExtensionItem extends BaseItem {
 }
 
 function elementToNode(element: Element): BaseItem {
-    if (element instanceof Package) {
+    if (implementsPackage(element)) {
         return new ExtensionItem(element);
     } else if (typeof element === 'string') {
         return new MessageItem(element);
-    } else {
+    } else if (implementsRegistry(element)) {
         return new RegistryItem(element);
     }
 

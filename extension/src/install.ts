@@ -3,7 +3,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { findPackage } from './findPackage';
-import { Package } from './Package';
+import { implementsPackage, Package } from './Package';
 import { Registry } from './Registry';
 import { RegistryProvider } from './RegistryProvider';
 
@@ -32,7 +32,7 @@ export async function installExtension(
     extensionId?: string,
     version?: string,
 ): Promise<Package> {
-    if (pkgOrRegistry instanceof Package) {
+    if (implementsPackage(pkgOrRegistry)) {
         await installExtensionByPackage(pkgOrRegistry);
         return pkgOrRegistry;
     } else {
@@ -52,7 +52,7 @@ export async function installExtension(
  * @returns the ID of the uninstalled extension.
  */
 export async function uninstallExtension(pkgOrExtId: Package | string): Promise<string> {
-    const extensionId = pkgOrExtId instanceof Package ? pkgOrExtId.extensionId : pkgOrExtId;
+    const extensionId = implementsPackage(pkgOrExtId) ? pkgOrExtId.extensionId : pkgOrExtId;
     await vscode.commands.executeCommand('workbench.extensions.uninstallExtension', extensionId);
 
     return extensionId;

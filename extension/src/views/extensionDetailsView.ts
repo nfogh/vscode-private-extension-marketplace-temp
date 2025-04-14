@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-import * as t from 'io-ts';
-import * as path from 'path';
 import * as vscode from 'vscode';
 import { Disposable, Uri } from 'vscode';
 import * as nls from 'vscode-nls/node';
@@ -9,35 +7,19 @@ import { ExtensionInfoService } from '../extensionInfo';
 import { Package } from '../Package';
 import { getReleaseChannel } from '../releaseChannel';
 import { getRemoteName } from '../remote';
-import { getNpmDownloadDir, readJSON } from '../util';
+import { getNpmDownloadDir } from '../util';
 
 import { MarkdownView } from './markdownView';
 import { WebView } from './webView';
 
 const localize = nls.loadMessageBundle();
 
-const ExtensionRepository = t.type({
-    type: t.string,
-    url: t.string
-});
-
-const ExtensionManifest = t.partial({
-    name: t.string,
-    displayName: t.string,
-    description: t.string,
-    version: t.string,
-    publisher: t.string,
-    icon: t.string,
-    repository: ExtensionRepository,
-});
-type ExtensionManifest = t.TypeOf<typeof ExtensionManifest>;
-
 interface ExtensionData {
     pkg: Package;
-    directory: string;
-    manifest: ExtensionManifest;
+    icon: Uri | null;
     readme: Uri | null;
     changelog: Uri | null;
+    repository: Uri | null;
 }
 
 export class ExtensionDetailsView extends WebView<ExtensionData> {
@@ -75,31 +57,27 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
     public async show(pkg: Package): Promise<void> {
         await pkg.updateState();
 
-        const { manifest, readme, changelog } = await pkg.getContents();
+        const { icon, readme, changelog, repository } = await pkg.getContents();
 
         const title = `Extension: ${pkg.displayName}`;
 
         const data: ExtensionData = {
-            directory: path.dirname(manifest.fsPath),
-            manifest: await readManifest(manifest),
+            icon,
             pkg,
             readme,
             changelog,
+            repository
         };
 
         await super.internalShow(data, title);
     }
 
+    public get icon(): Uri | null {
+        return this.data.icon;
+    }
+
     public get pkg(): Package {
         return this.data.pkg;
-    }
-
-    public get directory(): string {
-        return this.data.directory;
-    }
-
-    public get manifest(): ExtensionManifest {
-        return this.data.manifest;
     }
 
     public get readme(): Uri | null {
@@ -110,8 +88,8 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
         return this.data.changelog;
     }
 
-    public get repository(): string | undefined {
-        return this.data.manifest.repository?.url;
+    public get repository(): Uri | null {
+        return this.data.repository;
     }
 
     protected async getHead(nonce: string): Promise<string> {
@@ -229,11 +207,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
     }
 
     private getIcon() {
-        if (this.manifest.icon) {
-            return this.asWebviewUri(path.join(this.directory, this.manifest.icon));
-        } else {
-            return `${this.mediaUri}/defaultIcon.png`;
-        }
+        return this.icon ?? `${this.mediaUri}/defaultIcon.png`;
     }
 
     /**
@@ -384,12 +358,6 @@ async function addInstallButton(actions: string[], pkg: Package) {
 
 function getLocalResourceRoots() {
     return [Uri.file(getNpmDownloadDir())];
-}
-
-async function readManifest(uri: Uri): Promise<ExtensionManifest> {
-    const manifest = await readJSON(uri);
-
-    return ExtensionManifest.is(manifest) ? manifest : {};
 }
 
 async function packageHasChannels(pkg: Package) {
