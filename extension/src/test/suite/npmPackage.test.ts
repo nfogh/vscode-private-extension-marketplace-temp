@@ -9,7 +9,7 @@ import * as nls from 'vscode-nls/node';
 import { ExtensionInfoService } from '../../extensionInfo';
 import { NpmPackage } from '../../NpmPackage';
 import { NpmRegistry } from '../../NpmRegistry';
-import { PackageState } from '../../Package';
+import { PackageState } from '../../Extension';
 import { RegistrySource } from '../../Registry';
 import { CommonStubs, stubGlobalConfiguration, stubRemoteName } from '../stubs';
 

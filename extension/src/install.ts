@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
+import { implementsExtension, Extension, identifier } from './Extension';
 import { ExtensionInfoService } from './extensionInfo';
 import { findPackage } from './findPackage';
-import { implementsPackage, Package } from './Package';
 import { Registry } from './Registry';
 import { RegistryProvider } from './RegistryProvider';
 
@@ -13,7 +13,7 @@ const localize = nls.loadMessageBundle();
  * Installs the given extension package.
  * @returns the installed package.
  */
-export async function installExtension(pkg: Package): Promise<Package>;
+export async function installExtension(pkg: Extension): Promise<Extension>;
 /**
  * Installs the extension with the given ID, searching one or more registries
  * @param registry The registry containing the extension package, or a registry provider to search
@@ -26,17 +26,17 @@ export async function installExtension(
     registry: Registry | RegistryProvider,
     extensionId: string,
     version?: string,
-): Promise<Package>;
+): Promise<Extension>;
 export async function installExtension(
-    pkgOrRegistry: Package | Registry | RegistryProvider,
+    extOrRegistry: Extension | Registry | RegistryProvider,
     extensionId?: string,
     version?: string,
-): Promise<Package> {
-    if (implementsPackage(pkgOrRegistry)) {
-        await installExtensionByPackage(pkgOrRegistry);
-        return pkgOrRegistry;
+): Promise<Extension> {
+    if (implementsExtension(extOrRegistry)) {
+        await installExtensionByPackage(extOrRegistry);
+        return extOrRegistry;
     } else {
-        const registry = pkgOrRegistry;
+        const registry = extOrRegistry;
 
         if (extensionId === undefined) {
             throw new TypeError('extensionId must be defined');
@@ -48,11 +48,13 @@ export async function installExtension(
 
 /**
  * Uninstalls the given extension.
- * @param pkgOrExtId The package or extension ID of the extension to uninstall.
+ * @param extOrExtId The package or extension ID of the extension to uninstall.
  * @returns the ID of the uninstalled extension.
  */
-export async function uninstallExtension(pkgOrExtId: Package | string): Promise<string> {
-    const extensionId = implementsPackage(pkgOrExtId) ? pkgOrExtId.extensionId : pkgOrExtId;
+export async function uninstallExtension(extOrExtId: Extension | string): Promise<string> {
+    const extensionId = implementsExtension(extOrExtId)
+        ? identifier(extOrExtId.publisher(), extOrExtId.name())
+        : extOrExtId;
     await vscode.commands.executeCommand('workbench.extensions.uninstallExtension', extensionId);
 
     return extensionId;
@@ -63,7 +65,7 @@ export async function uninstallExtension(pkgOrExtId: Package | string): Promise<
  * user to reload the window if necessary.
  * @param packages The packages to update.
  */
-export async function updateExtensions(extensionInfo: ExtensionInfoService, packages: Package[]): Promise<void> {
+export async function updateExtensions(extensionInfo: ExtensionInfoService, packages: Extension[]): Promise<void> {
     const increment = 100 / packages.length;
 
     await vscode.window.withProgress(
@@ -113,16 +115,15 @@ export async function showReloadPrompt(message: string): Promise<void> {
 
 /**
  * Installs the given extension package.
- * @param pkg
  */
-async function installExtensionByPackage(pkg: Package) {
-    const { vsix } = await pkg.getContents();
-
-    if (!vsix) {
+async function installExtensionByPackage(extension: Extension) {
+    const extensionVersion = await extension.getVersion('latest');
+    if (extensionVersion === undefined) {
         throw new Error(
-            localize('extension.missing.vsix', 'Extension {0} does not contain a .vsix package.', pkg.toString()),
+            `Cannot find latest extension version for ${identifier(extension.publisher(), extension.name())}`,
         );
     }
+    const vsix = await extensionVersion.vsix();
 
     await vscode.commands.executeCommand('workbench.extensions.installExtension', vsix);
 }

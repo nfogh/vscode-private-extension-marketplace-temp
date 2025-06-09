@@ -142,7 +142,7 @@ export class ExtensionsFileFeatures implements Disposable, vscode.CompletionItem
             return this.cachedExtensionItems;
         }
 
-        const packages = await this.registryProvider.getUniquePackages();
+        const packages = await this.registryProvider.getUniqueExtensions();
 
         const items = packages.map(
             (pkg) =>

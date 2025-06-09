@@ -35,7 +35,7 @@
     "activationEvents": [
         "onStartupFinished"
     ],
-    "main": "./dist/extension.js",
+    "main": "./dist/main.js",
     "contributes": {
         "jsonValidation": [
             {

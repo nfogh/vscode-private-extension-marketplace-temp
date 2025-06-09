@@ -6,7 +6,7 @@ import { gt, parse as parseVersion, SemVer } from 'semver';
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
-import { Package, PackageState } from './Package';
+import { Extension, PackageState } from './Extension';
 import { Registry, VersionInfo } from './Registry';
 import { LATEST } from './releaseChannel';
 import { assertType, options } from './typeUtil';
@@ -73,8 +73,8 @@ type PackageManifest = t.TypeOf<typeof PackageManifest>;
 /**
  * Represents an NPM package for an extension.
  */
-export class NpmPackage implements Package {
-    public type: 'Package' = 'Package';
+export class NpmPackage implements Extension {
+    public type: 'Extension' = 'Extension';
     /**
      * Comparison function to sort packages by name in alphabetical order.
      */
@@ -273,9 +273,9 @@ export class NpmPackage implements Package {
     public async getContents(): Promise<{
         icon: vscode.Uri | null;
         vsix: vscode.Uri | null;
-        readme: vscode.Uri | null;
-        changelog: vscode.Uri | null;
-        repository: vscode.Uri | null;
+        readme: vscode.Uri | string | null;
+        changelog: vscode.Uri | string | null;
+        repository: vscode.Uri | string | null;
     }> {
         const directory = await this.registry.downloadPackage(this);
         const vsix = this.vsixFile;

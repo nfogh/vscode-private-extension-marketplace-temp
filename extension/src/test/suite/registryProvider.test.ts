@@ -12,7 +12,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { NpmRegistry } from '../../NpmRegistry';
-import { Package } from '../../Package';
+import { Extension } from '../../Extension';
 import { RegistrySource } from '../../Registry';
 import { RegistryProvider } from '../../RegistryProvider';
 import { clearCache, mockSearch, PackageMetadata } from '../npmUtil';
@@ -107,7 +107,7 @@ suite('Registry Provider', async function () {
 
         const provider = await RegistryProvider.create(extensionInfo);
 
-        const packages = await provider.getUniquePackages();
+        const packages = await provider.getUniqueExtensions();
         packages.sort((a, b) => a.compare(b));
 
         const expected = [
@@ -125,7 +125,7 @@ suite('Registry Provider', async function () {
         stubGlobalConfiguration('privateExtensions', USER_REGISTRY_CONFIG_CHANNEL);
 
         const provider = await RegistryProvider.create(extensionInfo);
-        const packages = await provider.getUniquePackages();
+        const packages = await provider.getUniqueExtensions();
         packages.sort((a, b) => a.compare(b));
 
         const expected = [
@@ -333,7 +333,7 @@ const USER_PACKAGE: Record<string, PackageMetadata> = {
     },
 };
 
-const EXPECT_PACKAGE: Record<string, Partial<Package>> = {
+const EXPECT_PACKAGE: Record<string, Partial<Extension>> = {
     test: {
         extensionId: 'test.test',
         version: new SemVer('1.0.0'),

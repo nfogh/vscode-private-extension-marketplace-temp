@@ -5,11 +5,11 @@ import * as vscode from 'vscode';
 import { Disposable, EventEmitter } from 'vscode';
 import * as nls from 'vscode-nls/node';
 
+import { Extension, identifier } from './Extension';
 import { ExtensionInfoService } from './extensionInfo';
 import { FileRegistry } from './FileRegistry';
 import { getLogger } from './logger';
 import { NpmRegistry } from './NpmRegistry';
-import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
 import { decodeType } from './typeUtil';
 import { getUserRegistryConfig } from './UserRegistry';
@@ -140,16 +140,16 @@ export class RegistryProvider implements Disposable {
      * Gets all packages with unique extension IDs from all registries
      * for the current workspace.
      */
-    public async getUniquePackages(): Promise<Package[]> {
-        const results = new Map<string, Package>();
+    public async getUniqueExtensions(): Promise<Extension[]> {
+        const results = new Map<string, Extension>();
 
         for (const registry of this.getRegistries()) {
             try {
-                for (const pkg of await registry.getPackages()) {
-                    results.set(pkg.extensionId, pkg);
+                for (const extension of await registry.getExtensions()) {
+                    results.set(identifier(extension.publisher(), extension.name()), extension);
                 }
             } catch (error) {
-                getLogger().log(`Unable to get extensions from ${registry.name} (${registry.uri}) ${error}`);
+                getLogger().log(`Unable to get extensions from ${registry.name} (${registry.registryUrl}) ${error}`);
             }
         }
 
@@ -298,7 +298,7 @@ async function createRegistry(
 
     if (type) {
         if (type === 'vsx') {
-            return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+            return new VsxRegistry(name, options.registry ?? 'https://open-vsx.org', options);
         } else if (type === 'file' && options.registry !== undefined) {
             return new FileRegistry(extensionInfo, name, options.registry, options.query ?? '*');
         } else {
@@ -310,7 +310,7 @@ async function createRegistry(
             if (await NpmRegistry.isRegistry(options.registry)) {
                 return new NpmRegistry(extensionInfo, name, registrySource, options);
             } else if (await VsxRegistry.isRegistry(options.registry)) {
-                return new VsxRegistry(extensionInfo, name, options.registry ?? 'https://open-vsx.org', options);
+                return new VsxRegistry(name, options.registry ?? 'https://open-vsx.org', options);
             } else if ((await FileRegistry.isRegistry(options.registry)) && options.registry) {
                 return new FileRegistry(extensionInfo, name, options.registry, options.query ?? '*');
             } else {

@@ -9,7 +9,7 @@ import { Uri } from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { NpmRegistry } from '../../NpmRegistry';
-import { Package } from '../../Package';
+import { Extension } from '../../Extension';
 import { RegistrySource } from '../../Registry';
 import { LATEST } from '../../releaseChannel';
 import { clearCache, mockSearch, PackageMetadata } from '../npmUtil';
@@ -88,7 +88,7 @@ suite('Registry Package Search', function () {
             registry: REGISTRY_URL,
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.foo, EXPECT.bar, EXPECT.baz];
 
         assert.containSubset(results, expected);
@@ -101,7 +101,7 @@ suite('Registry Package Search', function () {
             query: 'keywords:foo',
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.foo];
 
         assert.containSubset(results, expected);
@@ -114,7 +114,7 @@ suite('Registry Package Search', function () {
             query: 'keywords:bar',
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.bar];
 
         assert.containSubset(results, expected);
@@ -127,7 +127,7 @@ suite('Registry Package Search', function () {
             query: 'keywords:b-packages',
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.bar, EXPECT.baz];
 
         assert.containSubset(results, expected);
@@ -140,7 +140,7 @@ suite('Registry Package Search', function () {
             query: 'keywords:foo keywords:bar',
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.foo, EXPECT.bar];
 
         assert.containSubset(results, expected);
@@ -154,7 +154,7 @@ suite('Registry Package Search', function () {
             query: ['keywords:foo', 'keywords:bar'],
         });
 
-        const results = await registry.getPackages();
+        const results = await registry.getExtensions();
         const expected = [EXPECT.foo, EXPECT.bar];
 
         assert.containSubset(results, expected);
@@ -320,7 +320,7 @@ const PACKAGE: Record<string, PackageMetadata> = {
 /**
  * Key/values to expect in `Package` objects.
  */
-const EXPECT: Record<string, Partial<Package>> = {
+const EXPECT: Record<string, Partial<Extension>> = {
     foo: {
         name: 'foo',
         displayName: 'foo',

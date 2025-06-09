@@ -4,7 +4,7 @@ import { Disposable, Uri } from 'vscode';
 import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../extensionInfo';
-import { Package } from '../Package';
+import { Extension } from '../Extension';
 import { getReleaseChannel } from '../releaseChannel';
 import { getRemoteName } from '../remote';
 import { getNpmDownloadDir } from '../util';
@@ -15,11 +15,11 @@ import { WebView } from './webView';
 const localize = nls.loadMessageBundle();
 
 interface ExtensionData {
-    pkg: Package;
+    pkg: Extension;
     icon: Uri | null;
-    readme: Uri | null;
-    changelog: Uri | null;
-    repository: Uri | null;
+    readme: Uri | string | null;
+    changelog: Uri | string | null;
+    repository: Uri | string | null;
 }
 
 export class ExtensionDetailsView extends WebView<ExtensionData> {
@@ -54,7 +54,7 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
         }
     }
 
-    public async show(pkg: Package): Promise<void> {
+    public async show(pkg: Extension): Promise<void> {
         await pkg.updateState();
 
         const { icon, readme, changelog, repository } = await pkg.getContents();
@@ -76,19 +76,19 @@ export class ExtensionDetailsView extends WebView<ExtensionData> {
         return this.data.icon;
     }
 
-    public get pkg(): Package {
+    public get pkg(): Extension {
         return this.data.pkg;
     }
 
-    public get readme(): Uri | null {
+    public get readme(): Uri | string | null {
         return this.data.readme;
     }
 
-    public get changelog(): Uri | null {
+    public get changelog(): Uri | string | null {
         return this.data.changelog;
     }
 
-    public get repository(): Uri | null {
+    public get repository(): Uri | string | null {
         return this.data.repository;
     }
 
@@ -340,7 +340,7 @@ function addActionButton(actions: string[], classList: string, label: string, co
  * @param actions An array of HTML fragments to which the action should be added.
  * @param pkg The extension to install.
  */
-async function addInstallButton(actions: string[], pkg: Package) {
+async function addInstallButton(actions: string[], pkg: Extension) {
     let text: string;
 
     if (vscode.env.remoteName) {
@@ -360,7 +360,7 @@ function getLocalResourceRoots() {
     return [Uri.file(getNpmDownloadDir())];
 }
 
-async function packageHasChannels(pkg: Package) {
+async function packageHasChannels(pkg: Extension) {
     const channels = await pkg.getChannels();
     return Object.keys(channels).length > 1;
 }

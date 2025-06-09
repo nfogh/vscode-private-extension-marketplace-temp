@@ -1,6 +1,6 @@
 import * as nls from 'vscode-nls/node';
 
-import { Package } from './Package';
+import { Extension } from './Extension';
 import { Registry, VersionInfo } from './Registry';
 import { RegistryProvider } from './RegistryProvider';
 
@@ -17,7 +17,7 @@ export async function findPackage(
     registry: Registry | RegistryProvider,
     extensionId: string,
     version?: string,
-): Promise<Package> {
+): Promise<Extension> {
     const registries = getRegistries(registry);
     const name = stripPublisher(extensionId);
 
@@ -100,59 +100,31 @@ async function _findChannels(registries: readonly Registry[], name: string) {
     return results;
 }
 
-function isHttpError(err: unknown): err is { statusCode: number } {
-    return (
-        typeof err === 'object' &&
-        err !== null &&
-        'statusCode' in err &&
-        typeof (err as { statusCode: unknown }).statusCode === 'number'
-    );
-}
-
-async function tryGetPackage(registry: Registry, name: string, version?: string) {
+async function tryGetPackage(registry: Registry, name: string, version?: string): Promise<Extension | null> {
     try {
         return await registry.getPackage(name, version);
-    } catch (ex) {
-        if (isHttpError(ex) && ex.statusCode === 404) {
-            // Ignore 404 errors. The registry does not have the package.
-            return null;
-        } else {
-            throw ex;
-        }
+    } catch {
+        return null;
     }
 }
 
-async function tryGetVersions(registry: Registry, name: string) {
+async function tryGetVersions(registry: Registry, name: string): Promise<VersionInfo[] | null> {
     try {
         return await registry.getPackageVersions(name);
-    } catch (ex) {
-        if (isHttpError(ex) && ex.statusCode === 404) {
-            // Ignore 404 errors. The registry does not have the package.
-            return null;
-        } else {
-            throw ex;
-        }
+    } catch {
+        return null;
     }
 }
 
-async function tryGetChannels(registry: Registry, name: string) {
+async function tryGetChannels(registry: Registry, name: string): Promise<Record<string, VersionInfo> | null> {
     try {
         return await registry.getPackageChannels(name);
-    } catch (ex) {
-        if (isHttpError(ex) && ex.statusCode === 404) {
-            // Ignore 404 errors. The registry does not have the package.
-            return null;
-        } else {
-            throw ex;
-        }
+    } catch {
+        return null;
     }
 }
 
 function stripPublisher(extensionId: string) {
-    const dot = extensionId.indexOf('.');
-    if (dot < 0) {
-        return extensionId;
-    }
-
-    return extensionId.substr(dot + 1);
+    const split = extensionId.split('.');
+    return split.length === 2 ? split[1] : extensionId;
 }

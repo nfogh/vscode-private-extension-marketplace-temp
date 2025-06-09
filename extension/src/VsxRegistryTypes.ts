@@ -85,7 +85,7 @@ export const ExtensionReplacementRT = options(
     },
 );
 
-export const QueryEntryRT = options(
+export const ExtensionMetadataRT = options(
     {
         namespaceUrl: t.string,
         reviewsUrl: t.string,
@@ -143,7 +143,7 @@ export const QueryEntryRT = options(
 
 export const QueryResultRT = options(
     {
-        extensions: t.array(QueryEntryRT),
+        extensions: t.array(ExtensionMetadataRT),
     },
     {
         offset: t.number,
@@ -172,5 +172,5 @@ export type VersionsResult = t.TypeOf<typeof VersionsResultRT>;
 export type SearchEntry = t.TypeOf<typeof SearchEntryRT>;
 export type SearchResult = t.TypeOf<typeof SearchResultRT>;
 
-export type QueryEntry = t.TypeOf<typeof QueryEntryRT>;
+export type ExtensionMetadata = t.TypeOf<typeof ExtensionMetadataRT>;
 export type QueryResult = t.TypeOf<typeof QueryResultRT>;

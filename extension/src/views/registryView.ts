@@ -4,7 +4,7 @@ import * as nls from 'vscode-nls/node';
 
 import { ExtensionInfoService } from '../extensionInfo';
 import { getLogger } from '../logger';
-import { implementsPackage, Package, PackageState } from '../Package';
+import { implementsPackage, Extension, PackageState } from '../Extension';
 import { implementsRegistry, Registry } from '../Registry';
 import * as registry from '../Registry';
 import { RegistryProvider } from '../RegistryProvider';
@@ -74,7 +74,7 @@ export class RegistryView implements Disposable {
 
     private startBadgeUpdater(extensionsTree: vscode.TreeView<Element>): Disposable {
         return this.registryProvider.onDidChangeRegistries(async () => {
-            const pkgs = await this.registryProvider.getUniquePackages();
+            const pkgs = await this.registryProvider.getUniqueExtensions();
             const packagesWithUpdates = pkgs.filter((pkg) => pkg.isUpdateAvailable);
             extensionsTree.badge = {
                 value: packagesWithUpdates.length,
@@ -95,12 +95,12 @@ export class RegistryView implements Disposable {
         }
     }
 
-    public async showExtension(pkg: Package): Promise<void> {
+    public async showExtension(pkg: Extension): Promise<void> {
         await this.extensionView.show(pkg);
     }
 }
 
-type Element = Registry | Package | string;
+type Element = Registry | Extension | string;
 
 /**
  * TreeDataProvider for the Extensions section of the sidebar panel.
@@ -211,9 +211,9 @@ class RecommendedProvider implements TreeDataProvider<Element>, Disposable {
 
     protected async getRecommendedExtensions() {
         const recommendedExtensions = this.registryProvider.getRecommendedExtensions();
-        const extensions: Package[] = [];
+        const extensions: Extension[] = [];
 
-        for (const pkg of await this.registryProvider.getUniquePackages()) {
+        for (const pkg of await this.registryProvider.getUniqueExtensions()) {
             if (recommendedExtensions.has(pkg.extensionId)) {
                 extensions.push(pkg);
             }
@@ -255,7 +255,7 @@ class RegistryItem extends BaseItem {
 
     public async getExtensions() {
         try {
-            const children = await this.registry.getPackages();
+            const children = await this.registry.getExtensions();
             children.sort((a, b) => a.compare(b));
             return children;
         } catch (error) {
@@ -276,7 +276,7 @@ class RegistryItem extends BaseItem {
 }
 
 class ExtensionItem extends BaseItem {
-    constructor(public readonly pkg: Package) {
+    constructor(public readonly pkg: Extension) {
         super(pkg.displayName, vscode.TreeItemCollapsibleState.None);
 
         this.command = {

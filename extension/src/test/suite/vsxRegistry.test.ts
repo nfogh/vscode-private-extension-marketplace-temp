@@ -7,7 +7,7 @@ import sinon = require('sinon');
 
 import { ExtensionInfoService } from '../../extensionInfo';
 import { VsxRegistry } from '../../VsxRegistry';
-import { SearchEntry, SearchResult, QueryEntry, QueryResult, VersionsResult } from '../../VsxRegistryTypes';
+import { SearchEntry, SearchResult, ExtensionMetadata, QueryResult, VersionsResult } from '../../VsxRegistryTypes';
 
 import 'source-map-support/register';
 
@@ -90,7 +90,7 @@ suite('VSX Registry Package Search', function () {
             REGISTRY_URL,
             {},
         );
-        const packages = await registry.getPackages();
+        const packages = await registry.getExtensions();
         assert.equal(packages.length, 2);
     });
 
@@ -98,7 +98,7 @@ suite('VSX Registry Package Search', function () {
         const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
             query: 'foo',
         });
-        const packages = await registry.getPackages();
+        const packages = await registry.getExtensions();
         assert.equal(packages.length, 1);
         assert.equal(packages[0].name, 'foo');
     });
@@ -107,7 +107,7 @@ suite('VSX Registry Package Search', function () {
         const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
             query: 'unknown',
         });
-        const packages = await registry.getPackages();
+        const packages = await registry.getExtensions();
         assert.equal(packages.length, 0);
     });
 
@@ -123,7 +123,7 @@ suite('VSX Registry Package Search', function () {
         const registry = new VsxRegistry(sinon.createStubInstance(ExtensionInfoService), 'FakeRegistry', REGISTRY_URL, {
             query: 'unknown',
         });
-        const versions = await registry.getPackageVersions('baz.foo');
+        const versions = await registry.getVersions('baz.foo');
         assert.equal(versions.length, 2);
         assert.containSubset(versions, [{ version: new SemVer('1.0.1') }, { version: new SemVer('1.0.0') }]);
     });
@@ -168,7 +168,7 @@ function makeSearchResult(searchEntries: SearchEntry[]): SearchResult {
     };
 }
 
-const FOOEXTENSION_QUERY: QueryEntry = {
+const FOOEXTENSION_QUERY: ExtensionMetadata = {
     name: 'foo',
     namespaceUrl: 'https://example.com/foo/namespace',
     reviewsUrl: 'https://example.com/foo/reviews',
@@ -187,7 +187,7 @@ const FOOEXTENSION_QUERY: QueryEntry = {
     deprecated: false,
 };
 
-function makeQueryResult(extension: QueryEntry): QueryResult {
+function makeQueryResult(extension: ExtensionMetadata): QueryResult {
     return {
         offset: 0,
         totalSize: 1,

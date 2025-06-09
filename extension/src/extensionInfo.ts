@@ -5,7 +5,7 @@ import * as nls from 'vscode-nls/node';
 
 import { context } from './context';
 import { getLogger } from './logger';
-import { Package } from './Package';
+import { Extension } from './Extension';
 import { toString } from './util';
 
 const localize = nls.loadMessageBundle();
@@ -205,7 +205,7 @@ export class ExtensionInfoService implements vscode.Disposable {
      * Gets whether the currently-installed version of the extension is newer or egual than
      * the version of the given package.
      */
-    public async didExtensionUpdate(pkg: Package): Promise<boolean> {
+    public async didExtensionUpdate(pkg: Extension): Promise<boolean> {
         const extension = await this.getExtension(pkg.extensionId);
         if (!extension) {
             getLogger().log(

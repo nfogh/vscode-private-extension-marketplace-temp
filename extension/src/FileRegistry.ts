@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from './extensionInfo';
 import { NpmPackage } from './NpmPackage';
-import { Package } from './Package';
+import { Extension } from './Extension';
 import { Registry, RegistrySource, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
 
@@ -95,7 +95,7 @@ export class FileRegistry implements Registry {
         return vscode.Uri.parse(this.registryUri);
     }
 
-    async downloadPackage(packageOrSpec: Package | string): Promise<vscode.Uri> {
+    async downloadPackage(packageOrSpec: Extension | string): Promise<vscode.Uri> {
         const spec = typeof packageOrSpec === 'string' ? packageOrSpec : packageOrSpec.spec;
         const [name, version] = spec.split('@');
         const pkg = await this.getPackage(name, version);
@@ -126,10 +126,10 @@ export class FileRegistry implements Registry {
         return vscode.Uri.file(path.join(extractedPath, 'extension'));
     }
 
-    async getPackages(cancellationToken?: vscode.CancellationToken): Promise<Package[]> {
+    async getExtensions(cancellationToken?: vscode.CancellationToken): Promise<Extension[]> {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache, cancellationToken);
 
-        const packages: Package[] = manifests.map((pkg) => new NpmPackage(this, pkg.manifest));
+        const packages: Extension[] = manifests.map((pkg) => new NpmPackage(this, pkg.manifest));
         packages.sort((a, b) => -a.version.compare(b.version));
 
         const uniquePackages = packages.filter(
@@ -151,7 +151,7 @@ export class FileRegistry implements Registry {
         return versions.sort((a, b) => a.version.compare(b.version));
     }
 
-    async getPackage(name: string, version?: string): Promise<Package> {
+    async getPackage(name: string, version?: string): Promise<Extension> {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache);
         const matchingManifests = manifests.filter(
             (manifest) => manifest.manifest.name === name && (!version || manifest.manifest.version === version),

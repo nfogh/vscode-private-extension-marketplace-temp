@@ -18,7 +18,7 @@ suite('File Registry Package Search', function () {
             'FakeRegistry',
             fileRegistry.fsPath,
         );
-        const packages = await registry.getPackages();
+        const packages = await registry.getExtensions();
         expect(packages.length).to.equal(2);
         expect(
             packages.find((pkg) => pkg.name === 'my-extension1' && pkg.version.version === '0.0.3'),

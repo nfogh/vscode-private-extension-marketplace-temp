@@ -2,12 +2,15 @@ import * as vscode from 'vscode';
 import { Disposable } from 'vscode';
 import * as nls from 'vscode-nls/node';
 
+import { Extension, identifier } from './Extension';
 import { ExtensionInfoService } from './extensionInfo';
 import { updateExtensions } from './install';
 import { getLogger } from './logger';
-import { Package } from './Package';
 import { RegistryProvider } from './RegistryProvider';
 import { getConfig } from './util';
+
+import * as SemVer from 'semver';
+import { install } from 'source-map-support';
 
 const localize = nls.loadMessageBundle();
 
@@ -68,7 +71,7 @@ export class UpdateChecker implements Disposable {
      *      should run silently in the background unless an update is available.
      */
     public async checkForUpdates(isAutomaticCheck = false): Promise<void> {
-        const updates = await this.getPackagesWithUpdates();
+        const updates = await this.getExtensionsWithUpdates();
 
         if (updates.length > 0) {
             if (this.autoUpdate) {
@@ -85,7 +88,7 @@ export class UpdateChecker implements Disposable {
      * Checks for any out-of-date extensions and updates them if any are found.
      */
     public async updateAll(): Promise<void> {
-        const updates = await this.getPackagesWithUpdates();
+        const updates = await this.getExtensionsWithUpdates();
 
         if (updates.length > 0) {
             await updateExtensions(this.extensionInfo, updates);
@@ -114,10 +117,31 @@ export class UpdateChecker implements Disposable {
         }
     }
 
-    private async getPackagesWithUpdates() {
-        const packages = await this.registryProvider.getUniquePackages();
+    private async getExtensionsWithUpdates(): Promise<Extension[]> {
+        const extensions = await this.registryProvider.getUniqueExtensions();
 
-        return packages.filter((pkg) => pkg.isUpdateAvailable);
+        const extensionToIdVersionMap: (ext: Extension) => Promise<[string, string]> = async (extension) => [
+            identifier(extension.publisher(), extension.name()),
+            (await extension.versions())[0],
+        ];
+        const latestAvailableExtensions = new Map<string, string>(
+            await Promise.all(extensions.map(extensionToIdVersionMap)),
+        );
+
+        const updatableExtensions = extensions.filter((extension) => {
+            const installedExtension = vscode.extensions.getExtension(
+                identifier(extension.publisher(), extension.name()),
+            );
+            return (
+                installedExtension !== undefined &&
+                SemVer.lt(
+                    installedExtension.packageJSON.version,
+                    latestAvailableExtensions.get(installedExtension.id) ?? '',
+                )
+            );
+        });
+
+        return updatableExtensions;
     }
 
     private async showNoUpdatesMessage() {
@@ -126,7 +150,7 @@ export class UpdateChecker implements Disposable {
         );
     }
 
-    private async showUpdatePrompt(updates: Package[]) {
+    private async showUpdatePrompt(updates: Extension[]) {
         const showUpdates = localize('show.updates', 'Show Updates');
         const updateAll = localize('update.all.extensions', 'Update All Extensions');
 

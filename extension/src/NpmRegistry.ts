@@ -15,7 +15,7 @@ import * as nls from 'vscode-nls/node';
 import { ExtensionInfoService } from './extensionInfo';
 import { getLogger } from './logger';
 import { NpmPackage } from './NpmPackage';
-import { Package } from './Package';
+import { Extension } from './Extension';
 import { Registry, RegistrySource, VersionMissingError, RegistryOptions, VersionInfo } from './Registry';
 import { getReleaseChannel, LATEST } from './releaseChannel';
 import { assertType, options } from './typeUtil';
@@ -135,7 +135,7 @@ export class NpmRegistry implements Registry {
      *
      * @param packageOrSpec A package to download, or an NPM package specifier.
      */
-    public async downloadPackage(packageOrSpec: Package | string): Promise<Uri> {
+    public async downloadPackage(packageOrSpec: Extension | string): Promise<Uri> {
         const spec = typeof packageOrSpec === 'string' ? packageOrSpec : packageOrSpec.spec;
 
         const registryDir = sanitize(this.options.registry ?? this.name);
@@ -154,8 +154,8 @@ export class NpmRegistry implements Registry {
      *
      * @param token Token to use to cancel the search.
      */
-    public async getPackages(token?: CancellationToken): Promise<Package[]> {
-        const packages: Package[] = [];
+    public async getExtensions(token?: CancellationToken): Promise<Extension[]> {
+        const packages: Extension[] = [];
 
         for await (const result of this.findMatchingPackages(this.query, token)) {
             if (token?.isCancellationRequested) {
@@ -249,7 +249,7 @@ export class NpmRegistry implements Registry {
      * If `version` is omitted, this gets the latest version for the user's selected channel.
      * @throws VersionMissingError if the given version does not exist.
      */
-    public async getPackage(name: string, version?: string): Promise<Package> {
+    public async getPackage(name: string, version?: string): Promise<Extension> {
         const metadata = await this.getPackageMetadata(name);
 
         assertType(metadata, PackageVersionData, `In package "${name}"`);
