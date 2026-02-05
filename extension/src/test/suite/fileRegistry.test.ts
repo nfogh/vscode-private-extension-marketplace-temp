@@ -46,4 +46,19 @@ suite('File Registry Package Search', function () {
 
         expect(versions2).to.deep.contain({ version: new SemVer('1.0.0') });
     });
+
+    test('invalid packages shall not be included', async function () {
+        assert(vscode.workspace.workspaceFolders);
+        assert(vscode.workspace.workspaceFolders.length >= 1);
+        const fileRegistry = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'extensions');
+        const registry = new FileRegistry(
+            sinon.createStubInstance(ExtensionInfoService),
+            'FakeRegistry',
+            fileRegistry.fsPath,
+        );
+        const packages = await registry.getPackages();
+        expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension1' });
+        expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension2' });
+        expect(packages.map(({ name }) => ({ name }))).not.to.deep.include({ name: 'my-invalid-extension' });
+    });
 });

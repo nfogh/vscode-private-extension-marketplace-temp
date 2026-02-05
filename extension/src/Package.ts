@@ -58,10 +58,14 @@ function error(message: string): ResultError {
     return { type: 'error', error: new Error(message) };
 }
 
-const RepositoryType = t.type({
-    type: t.string,
-    url: t.string,
-});
+const RepositoryType = options(
+    {
+        url: t.string,
+    },
+    {
+        type: t.string,
+    },
+);
 
 /**
  * Fields expected for all NPM packages.

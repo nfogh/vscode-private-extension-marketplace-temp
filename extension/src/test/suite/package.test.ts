@@ -42,6 +42,27 @@ suite('Package', function () {
         sinon.restore();
     });
 
+    test('Invalid package shall throw', async function () {
+        stubs.stubExtension('test.test-package');
+
+        const registry = getDummyRegistry();
+
+        assert.throws(
+            () =>
+                new Package(registry, {
+                    name: 'test-package',
+                    publisher: 'Test',
+                    version: '1.2.3',
+                    displayName: 'Test Package',
+                    description: 'This is a test package.',
+                    engines: { vscode: '1.38.0' },
+                    repository: { invalid: '123' },
+                    files: ['extension.vsix'],
+                }),
+            Error,
+        );
+    });
+
     test('Metadata', async function () {
         stubs.stubExtension('test.test-package');
 

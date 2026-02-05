@@ -6,6 +6,7 @@ import { SemVer } from 'semver';
 import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from './extensionInfo';
+import { getLogger } from './logger';
 import { Package } from './Package';
 import { Registry, RegistrySource, VersionInfo, VersionMissingError } from './Registry';
 import { getNpmDownloadDir } from './util';
@@ -127,7 +128,14 @@ export class FileRegistry implements Registry {
     async getPackages(cancellationToken?: vscode.CancellationToken): Promise<Package[]> {
         const manifests = await getAllManifests(this.registryUri, this.query, this.manifestCache, cancellationToken);
 
-        const packages: Package[] = manifests.map((pkg) => new Package(this, pkg.manifest));
+        const packages = manifests.reduce<Package[]>((list, manifest) => {
+            try {
+                list.push(new Package(this, manifest.manifest));
+            } catch (error) {
+                getLogger().log(`Package invalid: ${error}. Manifest:\n${JSON.stringify(manifest.manifest, null, 2)}`);
+            }
+            return list;
+        }, []);
         packages.sort((a, b) => -a.version.compare(b.version));
 
         const uniquePackages = packages.filter(

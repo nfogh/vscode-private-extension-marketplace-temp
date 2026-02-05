@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.11.2
+
+-   Fixed: Filesystem registry provider doesn't work on .vsix files that doesn't
+           have a "type" field in the repository field. Closes issue #9
+-   Fixed: Skip invalid .vsix files in file registry provider instead of
+           failing to read extension list.
+
 ## 1.11.1
 
 -   Fixed: Don't validate URL input now we can have filesystem paths as input
