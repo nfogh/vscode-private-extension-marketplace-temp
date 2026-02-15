@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.11.4
+
+-   Fixed: Fix parsing of vsix files in filesystem provider where nls substitution was used. Fixes #11
+
+## 1.11.3 
+
+-   Fixed: Fix parsing of vsix files in filesystem provider where repository type is empty. Fixes #12
+
 ## 1.11.2
 
 -   Fixed: Filesystem registry provider doesn't work on .vsix files that doesn't

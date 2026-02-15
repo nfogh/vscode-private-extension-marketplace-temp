@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace-helper",
     "displayName": "Private Extension Marketplace: Helper",
     "description": "Lets Private Extension Marketplace work in remote workspaces.",
-    "version": "1.11.1",
+    "version": "1.11.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {

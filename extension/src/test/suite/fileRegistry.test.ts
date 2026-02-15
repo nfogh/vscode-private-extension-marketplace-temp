@@ -4,9 +4,21 @@ import sinon = require('sinon');
 import * as vscode from 'vscode';
 
 import { ExtensionInfoService } from '../../extensionInfo';
-import { FileRegistry } from '../../FileRegistry';
+import { FileRegistry, replaceIdentifiers } from '../../FileRegistry';
 
 import 'source-map-support/register';
+
+suite('File Registry Utilities', function () {
+    test('search-and-replace in object shall replace all instances of % delimited identifiers with those found in a record', async function () {
+        const parsedJson = JSON.parse('{"name": "Hello %user%", "age": "%age%", "nested": {"key": "%value%"}}');
+        const replacements = { user: 'Alice', age: '30', value: 'secret' };
+
+        const result = replaceIdentifiers(parsedJson, replacements);
+        expect(result.name).equals('Hello Alice');
+        expect(result.age).equals('30');
+        expect(result.nested.key).equals('secret');
+    });
+});
 
 suite('File Registry Package Search', function () {
     test('search for all packages shall return all packages', async function () {
@@ -72,5 +84,18 @@ suite('File Registry Package Search', function () {
         );
         const packages = await registry.getPackages();
         expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension-with-empty-repo-info' });
+    });
+
+    test('packages with i18n should get their data read from package.nls.json', async function () {
+        assert(vscode.workspace.workspaceFolders);
+        assert(vscode.workspace.workspaceFolders.length >= 1);
+        const fileRegistryDir = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'i18n');
+        const registry = new FileRegistry(
+            sinon.createStubInstance(ExtensionInfoService),
+            'FakeRegistry',
+            fileRegistryDir.fsPath,
+        );
+        const packages = await registry.getPackages();
+        expect(packages.map(({ displayName }) => ({ displayName }))).to.deep.include({ displayName: 'i18n' });
     });
 });

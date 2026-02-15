@@ -20,16 +20,55 @@ async function pathAccessible(path: string) {
     }
 }
 
+export function replaceIdentifiers(obj: any, replacements: Record<string, string>): any {
+    if (typeof obj === 'string') {
+        // Replace all occurrences of %identifier% in the string
+        return obj.replace(/%([^%]+)%/g, (_, identifier) => {
+            return replacements[identifier] || `%${identifier}%`;
+        });
+    }
+    if (Array.isArray(obj)) {
+        return obj.map((item) => replaceIdentifiers(item, replacements));
+    }
+    if (typeof obj === 'object' && obj !== null) {
+        const result: Record<string, any> = {};
+        for (const key in obj) {
+            result[key] = replaceIdentifiers(obj[key], replacements);
+        }
+        return result;
+    }
+    return obj;
+}
+
+function objectContainsStringWith(obj: any, chars: string): boolean {
+    if (typeof obj === 'string') {
+        return obj.includes(chars);
+    }
+    if (Array.isArray(obj)) {
+        return obj.some((item) => objectContainsStringWith(item, chars));
+    }
+    if (typeof obj === 'object' && obj !== null) {
+        return Object.values(obj).some((val) => objectContainsStringWith(val, chars));
+    }
+    return false;
+}
+
 async function getManifest(vsixPath: string, manifestCache: Map<string, any> | undefined) {
     if (manifestCache !== undefined && manifestCache.has(vsixPath)) {
         return manifestCache.get(vsixPath);
     }
 
     const zip = new node_stream_zip_async({ file: vsixPath });
-    const manifestFile = await zip.entryData('extension/package.json');
-    await zip.close();
+    const manifestFileContents = await zip.entryData('extension/package.json');
 
-    const manifest = JSON.parse(manifestFile.toString());
+    const manifestText = manifestFileContents.toString();
+    let manifest = JSON.parse(manifestText);
+    if (objectContainsStringWith(manifest, '%')) {
+        const nlsMapFileContents = await zip.entryData('extension/package.nls.json');
+        const i18nMap = JSON.parse(nlsMapFileContents.toString());
+        manifest = replaceIdentifiers(manifest, i18nMap);
+    }
+    await zip.close();
     manifestCache?.set(vsixPath, manifest);
     return manifest;
 }
