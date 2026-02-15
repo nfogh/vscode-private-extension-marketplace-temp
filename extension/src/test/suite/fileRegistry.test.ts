@@ -19,7 +19,6 @@ suite('File Registry Package Search', function () {
             fileRegistry.fsPath,
         );
         const packages = await registry.getPackages();
-        expect(packages.length).to.equal(2);
         expect(
             packages.find((pkg) => pkg.name === 'my-extension1' && pkg.version.version === '0.0.3'),
         ).is.not.undefined;
@@ -60,5 +59,18 @@ suite('File Registry Package Search', function () {
         expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension1' });
         expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension2' });
         expect(packages.map(({ name }) => ({ name }))).not.to.deep.include({ name: 'my-invalid-extension' });
+    });
+
+    test('packages with empty repository info shall be included', async function () {
+        assert(vscode.workspace.workspaceFolders);
+        assert(vscode.workspace.workspaceFolders.length >= 1);
+        const fileRegistry = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'extensions');
+        const registry = new FileRegistry(
+            sinon.createStubInstance(ExtensionInfoService),
+            'FakeRegistry',
+            fileRegistry.fsPath,
+        );
+        const packages = await registry.getPackages();
+        expect(packages.map(({ name }) => ({ name }))).to.deep.include({ name: 'my-extension-with-empty-repo-info' });
     });
 });
