@@ -43,7 +43,7 @@ The file has the following structure:
         }
     ],
     "recommendations": [
-        "garmin.example-extension"
+        "my-org.example-extension"
     ]
 }
 ```
@@ -90,7 +90,7 @@ extensions. Each item supports the following fields:
 The `recommendations` array is an optional list of private extensions from any
 of the registries which should be recommended for users of the workspace.
 The identifier of an extension is always `"${publisher}.${name}"`.
-For example: `"garmin.private-extension-manager"`.
+For example: `"my-org.example-extension"`.
 
 You may have multiple workspace folders that contain an `extensions.private.json`
 file. The extension manager will display the registries and recommendations from
@@ -115,7 +115,7 @@ You can use the **Private Extensions: Add Registry...** and
 Once a valid registry has been configured, a **Private Extensions** icon will
 appear on the activity bar:
 
-![Activity Bar Icon](https://raw.githubusercontent.com/joelspadin-garmin/vscode-private-extension-manager/master/extension/media/readme/activity-bar.png)
+![Activity Bar Icon](https://codeberg.org/nfogh/vscode-private-extension-marketplace/raw/branch/main/extension/media/readme/activity-bar.png)
 
 This works similarly to Visual Studio Code's built-in extensions manager and
 allows you to install, update, and uninstall private extensions.
@@ -279,7 +279,7 @@ to take effect.
 
 When using a [remote development](https://code.visualstudio.com/docs/remote/remote-overview)
 extension such as [Remote-SSH](https://code.visualstudio.com/docs/remote/ssh),
-install the [Private Extension Marketplace: Remote Helper](https://marketplace.visualstudio.com/items?itemName=Garmin.private-extension-manager-remote-helper)
+install the [Private Extension Marketplace: Remote Helper](https://marketplace.visualstudio.com/items?itemName=NikolajFogh.private-extension-marketplace-helper)
 extension to give Private Extension Marketplace access to the local machine.
 
 Private Extension Marketplace will attempt to infer where VS Code will install an
