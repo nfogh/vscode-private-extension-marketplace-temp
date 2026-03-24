@@ -68,6 +68,21 @@ async function getManifest(vsixPath: string, manifestCache: Map<string, any> | u
         const i18nMap = JSON.parse(nlsMapFileContents.toString());
         manifest = replaceIdentifiers(manifest, i18nMap);
     }
+
+    // Extract the icon from the zip and embed it as a data URI so it can be
+    // displayed in the sidebar webview without extracting the full package.
+    if (typeof manifest.icon === 'string') {
+        try {
+            const iconEntry = `extension/${manifest.icon}`;
+            const iconData = await zip.entryData(iconEntry);
+            const ext = manifest.icon.split('.').pop()?.toLowerCase() ?? 'png';
+            const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/png';
+            manifest.iconUrl = `data:${mime};base64,${iconData.toString('base64')}`;
+        } catch {
+            // Icon entry not found in zip — leave iconUrl undefined.
+        }
+    }
+
     await zip.close();
     manifestCache?.set(vsixPath, manifest);
     return manifest;

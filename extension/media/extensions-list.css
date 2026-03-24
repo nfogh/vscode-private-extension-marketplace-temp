@@ -1,0 +1,219 @@
+/* Sidebar extensions list — mirrors VS Code's built-in Extensions view layout */
+
+body {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#root {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.extensions-list {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Individual extension row ── */
+
+.extension-list-item {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    gap: 10px;
+    min-height: 62px;
+    box-sizing: border-box;
+}
+
+.extension-list-item:hover,
+.extension-list-item:focus {
+    background-color: var(--vscode-list-hoverBackground);
+    outline: none;
+}
+
+.extension-list-item:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+}
+
+/* ── Icon ── */
+
+.extension-list-item .icon-container {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    margin-top: 2px;
+}
+
+.extension-list-item .icon-container .icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* ── Details column ── */
+
+.extension-list-item .details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* ── Header: name + badge ── */
+
+.extension-list-item .header {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+}
+
+.extension-list-item .header .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--vscode-foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+}
+
+/* ── State badges ── */
+
+.extension-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.extension-badge.installed {
+    color: var(--vscode-extensionBadge-remoteForeground, #fff);
+    background-color: var(--vscode-extensionButton-prominentBackground, #007acc);
+}
+
+.extension-badge.prerelease {
+    color: var(--vscode-extensionBadge-remoteForeground, #fff);
+    background-color: var(--vscode-gitDecoration-modifiedResourceForeground, #e2c08d);
+}
+
+.extension-badge.update {
+    color: var(--vscode-extensionBadge-remoteForeground, #fff);
+    background-color: var(--vscode-notificationsWarningIcon-foreground, #cca700);
+}
+
+.extension-badge.invalid {
+    color: var(--vscode-extensionBadge-remoteForeground, #fff);
+    background-color: var(--vscode-errorForeground, #f48771);
+}
+
+/* ── Subtitle: publisher ── */
+
+.extension-list-item .subtitle {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+}
+
+.extension-list-item .subtitle .publisher {
+    font-size: 11px;
+    color: var(--vscode-descriptionForeground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Description ── */
+
+.extension-list-item .description {
+    font-size: 12px;
+    color: var(--vscode-descriptionForeground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+/* ── Action buttons ── */
+
+.extension-list-item .actions {
+    margin-top: 4px;
+}
+
+.extension-list-item .monaco-action-bar .actions-container {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.extension-list-item .action-item {
+    display: flex;
+}
+
+.extension-list-item .action-label.extension-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 2px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    color: var(--vscode-button-foreground);
+    background-color: var(--vscode-button-background);
+    border: none;
+    line-height: 20px;
+    min-width: 60px;
+}
+
+.extension-list-item .action-label.extension-action:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+.extension-list-item .action-label.extension-action.prominent {
+    color: var(--vscode-extensionButton-prominentForeground);
+    background-color: var(--vscode-extensionButton-prominentBackground);
+}
+
+.extension-list-item .action-label.extension-action.prominent:hover {
+    background-color: var(--vscode-extensionButton-prominentHoverBackground);
+}
+
+.extension-list-item .action-label.extension-action.uninstall {
+    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+    background-color: var(--vscode-button-secondaryBackground, transparent);
+    border: 1px solid var(--vscode-button-border, var(--vscode-contrastBorder, transparent));
+}
+
+.extension-list-item .action-label.extension-action.uninstall:hover {
+    background-color: var(--vscode-button-secondaryHoverBackground, var(--vscode-list-hoverBackground));
+}
+
+/* ── Empty state ── */
+
+.empty-message {
+    padding: 20px 12px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 13px;
+    text-align: center;
+}

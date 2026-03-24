@@ -83,6 +83,7 @@ const webviewConfig = {
     mode: 'none',
     entry: {
         'extension-details': './src/views/extension-details/index.ts',
+        'extensions-list': './src/views/extensions-list/index.ts',
     },
     devtool: 'nosources-source-map',
     output: {

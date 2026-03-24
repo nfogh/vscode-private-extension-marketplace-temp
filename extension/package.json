@@ -185,37 +185,19 @@
                     "id": "privateExtensions.extensions",
                     "name": "%views.privateExtensions.extensions.name%",
                     "when": "privateExtensions:active",
-                    "icon": "media/extensions.svg"
+                    "icon": "media/extensions.svg",
+                    "type": "webview"
                 },
                 {
                     "id": "privateExtensions.recommended",
                     "name": "%views.privateExtensions.recommended.name%",
                     "when": "privateExtensions:active",
-                    "icon": "media/extensions.svg"
+                    "icon": "media/extensions.svg",
+                    "type": "webview"
                 }
             ]
         },
-        "viewsWelcome": [
-            {
-                "view": "privateExtensions.extensions",
-                "contents": "%views.privateExtensions.extensions.noExtensions%",
-                "when": "privateExtensions:active"
-            },
-            {
-                "view": "privateExtensions.extensions",
-                "contents": "%views.privateExtensions.extensions.configure%",
-                "when": "workbenchState != empty"
-            },
-            {
-                "view": "privateExtensions.recommended",
-                "contents": "%views.privateExtensions.recommended.noExtensions%"
-            },
-            {
-                "view": "privateExtensions.recommended",
-                "contents": "%views.privateExtensions.recommended.configure%",
-                "when": "workbenchState != empty"
-            }
-        ],
+        "viewsWelcome": [],
         "menus": {
             "view/title": [
                 {

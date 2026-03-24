@@ -80,6 +80,8 @@ const PackageManifest = options(
         repository: t.union([t.string, RepositoryType]),
         files: t.array(t.string),
         osSpecificVsix: t.record(t.string, t.string),
+        /** Absolute URL or data URI for the extension icon, for display in the sidebar list. */
+        iconUrl: t.string,
     },
 );
 type PackageManifest = t.TypeOf<typeof PackageManifest>;
@@ -115,6 +117,8 @@ export class Package {
     public readonly downloads?: number;
     public readonly rating?: number;
     public readonly repository?: string;
+    /** Absolute URL or data URI for the extension icon, or undefined if not available. */
+    public readonly iconUrl?: string;
 
     private readonly _vsixFile: Result<string>;
     private readonly isPublisherValid: boolean;
@@ -141,6 +145,7 @@ export class Package {
         this.downloads = manifest.downloads;
         this.rating = manifest.rating;
         this.repository = typeof manifest.repository === 'string' ? manifest.repository : manifest.repository?.url;
+        this.iconUrl = manifest.iconUrl;
 
         // VS Code uses case-insensitive comparison to match extension IDs.
         // Match that behavior by normalizing everything to lowercase.

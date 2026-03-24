@@ -153,6 +153,7 @@ export class VsxRegistry implements Registry {
                         downloads: extension.downloadCount,
                         rating: extension.averageRating,
                         files: Object.values(extension.files),
+                        iconUrl: extension.files['icon'],
                     }),
             );
 
