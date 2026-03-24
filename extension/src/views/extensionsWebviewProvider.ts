@@ -23,6 +23,10 @@ interface WebviewMessage {
     extensionId: string;
 }
 
+function asWebviewUri(view: WebviewView, relativePath: string): vscode.Uri {
+    return view.webview.asWebviewUri(getExtensionFileUri(relativePath));
+}
+
 /**
  * Base class for webview sidebar panels that display a list of extensions.
  * Subclasses implement `loadPackages()` to control which packages are shown.
@@ -65,11 +69,11 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
 
         webviewView.onDidChangeVisibility(() => {
             if (webviewView.visible) {
-                this.refresh();
+                void this.refresh();
             }
         });
 
-        this.refresh();
+        void this.refresh();
     }
 
     public async refresh(): Promise<void> {
@@ -146,19 +150,19 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
         return text;
     }
 
-    private asWebviewUri(relativePath: string): vscode.Uri {
-        return this.view!.webview.asWebviewUri(getExtensionFileUri(relativePath));
-    }
-
     private getHtml(): string {
-        const nonce = this.getNonce();
-        const cspSource = this.view!.webview.cspSource;
+        if (!this.view) {
+            return '';
+        }
 
-        const scriptUri = this.asWebviewUri('dist/assets/extensions-list/index.js');
-        const workbenchCssUri = this.asWebviewUri('media/workbench.css');
-        const extensionCssUri = this.asWebviewUri('media/extension.css');
-        const sidebarCssUri = this.asWebviewUri('media/extensions-list.css');
-        const defaultIconUri = this.asWebviewUri('media/defaultIcon.png');
+        const nonce = this.getNonce();
+        const cspSource = this.view.webview.cspSource;
+
+        const scriptUri = asWebviewUri(this.view, 'dist/assets/extensions-list/index.js');
+        const workbenchCssUri = asWebviewUri(this.view, 'media/workbench.css');
+        const extensionCssUri = asWebviewUri(this.view, 'media/extension.css');
+        const sidebarCssUri = asWebviewUri(this.view, 'media/extensions-list.css');
+        const defaultIconUri = asWebviewUri(this.view, 'media/defaultIcon.png');
 
         const entries = this.getEntries();
         const entriesJson = JSON.stringify(entries);

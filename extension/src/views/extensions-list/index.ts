@@ -140,7 +140,11 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
                 vscode.postMessage({ type: 'uninstall', extensionId: entry.extensionId });
             }),
         );
-    } else if (entry.state === 'installed' || entry.state === 'installed.remote' || entry.state === 'installed.prerelease') {
+    } else if (
+        entry.state === 'installed' ||
+        entry.state === 'installed.remote' ||
+        entry.state === 'installed.prerelease'
+    ) {
         actionList.appendChild(
             createActionButton('Uninstall', 'uninstall', () => {
                 vscode.postMessage({ type: 'uninstall', extensionId: entry.extensionId });
@@ -179,7 +183,10 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
 }
 
 function render(): void {
-    const root = document.getElementById('root')!;
+    const root = document.getElementById('root');
+    if (!root) {
+        return;
+    }
     root.innerHTML = '';
 
     if (extensions.length === 0) {
