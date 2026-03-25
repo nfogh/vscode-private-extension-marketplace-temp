@@ -35,14 +35,23 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
     protected view?: WebviewView;
     private disposables: Disposable[] = [];
     protected packages: Package[] = [];
+    private loading = false;
 
     constructor(
         protected readonly registryProvider: RegistryProvider,
         private readonly onShowExtension: (pkg: Package) => void,
     ) {
         this.disposables.push(
+            // Registry config changed — re-fetch from registries.
             this.registryProvider.onDidChangeRegistries(() => this.refresh()),
-            vscode.extensions.onDidChange(() => this.refresh()),
+            // An extension was installed/uninstalled — update cached state and
+            // re-render without a full registry fetch.
+            vscode.extensions.onDidChange(() => this.refreshState()),
+            vscode.workspace.onDidChangeConfiguration((e) => {
+                if (e.affectsConfiguration('privateExtensions.maxExtensionsShown')) {
+                    this.render();
+                }
+            }),
         );
     }
 
@@ -67,18 +76,24 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
             this.handleMessage(message);
         });
 
-        webviewView.onDidChangeVisibility(() => {
-            if (webviewView.visible) {
-                void this.refresh();
-            }
-        });
-
         void this.refresh();
     }
 
     public async refresh(): Promise<void> {
         if (!this.view) {
             return;
+        }
+
+        // Show the spinner. On first load the webview has no HTML yet, so we
+        // render it now with loading=true so the spinner is in the DOM from
+        // the start. On subsequent refreshes we toggle it via postMessage to
+        // avoid replacing the HTML (which would reset the search box state).
+        const isFirstLoad = !this.view.webview.html;
+        this.loading = true;
+        if (isFirstLoad) {
+            this.render();
+        } else {
+            this.view.webview.postMessage({ type: 'setLoading', loading: true });
         }
 
         try {
@@ -88,12 +103,37 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
             this.packages = [];
         }
 
+        this.loading = false;
+        this.render();
+    }
+
+    /** Re-checks installed state on cached packages and re-renders without a registry fetch. */
+    private async refreshState(): Promise<void> {
+        await Promise.all(this.packages.map((pkg) => pkg.updateState()));
+        this.render();
+    }
+
+    private render(): void {
+        if (!this.view) {
+            return;
+        }
         this.view.webview.html = this.getHtml();
         this.updateBadge();
     }
 
     /** Returns the packages to display. Implemented by each subclass. */
     protected abstract loadPackages(): Promise<Package[]>;
+
+    /** Whether to show the search box. Defaults to true; subclasses may override. */
+    protected get showSearch(): boolean {
+        return true;
+    }
+
+    private getMaxExtensionsShown(): number {
+        return vscode.workspace
+            .getConfiguration('privateExtensions')
+            .get<number>('maxExtensionsShown', 100);
+    }
 
     private updateBadge(): void {
         if (!this.view) {
@@ -190,6 +230,9 @@ export abstract class ExtensionsListWebviewProvider implements WebviewViewProvid
     <script nonce="${nonce}">
         window.__EXTENSIONS__ = ${entriesJson};
         window.__DEFAULT_ICON__ = "${defaultIconUri}";
+        window.__SHOW_SEARCH__ = ${this.showSearch};
+        window.__MAX_EXTENSIONS__ = ${this.getMaxExtensionsShown()};
+        window.__LOADING__ = ${this.loading};
     </script>
     <script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
@@ -226,6 +269,10 @@ export class ExtensionsWebviewProvider extends ExtensionsListWebviewProvider {
  */
 export class RecommendedWebviewProvider extends ExtensionsListWebviewProvider {
     public static readonly viewId = 'privateExtensions.recommended';
+
+    protected override get showSearch(): boolean {
+        return false;
+    }
 
     protected async loadPackages(): Promise<Package[]> {
         const recommendedIds = this.registryProvider.getRecommendedExtensions();
