@@ -25,33 +25,8 @@ interface ExtensionsListWindow {
 const appWindow = window as unknown as Window & ExtensionsListWindow;
 
 const vscode = acquireVsCodeApi();
-const allExtensions: ExtensionEntry[] = appWindow.__EXTENSIONS__;
+const extensions: ExtensionEntry[] = appWindow.__EXTENSIONS__;
 const defaultIcon: string = appWindow.__DEFAULT_ICON__;
-
-const PAGE_SIZE = 50;
-
-// ── Search state ────────────────────────────────────────────────────────────
-
-let currentQuery = '';
-
-function matchesQuery(entry: ExtensionEntry, query: string): boolean {
-    if (!query) {
-        return true;
-    }
-    const q = query.toLowerCase();
-    return (
-        entry.displayName.toLowerCase().includes(q) ||
-        entry.description.toLowerCase().includes(q) ||
-        entry.publisher.toLowerCase().includes(q) ||
-        entry.extensionId.toLowerCase().includes(q)
-    );
-}
-
-function getFilteredExtensions(): ExtensionEntry[] {
-    return allExtensions.filter((e) => matchesQuery(e, currentQuery));
-}
-
-// ── DOM helpers ─────────────────────────────────────────────────────────────
 
 function stateLabel(state: string): { text: string; className: string } | null {
     switch (state) {
@@ -120,21 +95,25 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     const name = document.createElement('span');
     name.className = 'name';
     name.textContent = entry.displayName;
-    header.appendChild(name);
 
     const label = stateLabel(entry.state);
     if (label) {
         const badge = document.createElement('span');
         badge.className = `extension-badge ${label.className}`;
         badge.textContent = label.text;
+        header.appendChild(name);
         header.appendChild(badge);
+    } else {
+        header.appendChild(name);
     }
 
     const subtitle = document.createElement('div');
     subtitle.className = 'subtitle';
+
     const publisher = document.createElement('span');
     publisher.className = 'publisher';
     publisher.textContent = entry.publisher;
+
     subtitle.appendChild(publisher);
 
     const description = document.createElement('div');
@@ -190,6 +169,7 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     item.appendChild(iconContainer);
     item.appendChild(details);
 
+    // Clicking the item body (not buttons) opens the details view
     item.addEventListener('click', () => {
         vscode.postMessage({ type: 'showExtension', extensionId: entry.extensionId });
     });
@@ -202,84 +182,18 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     return item;
 }
 
-// ── Search box ───────────────────────────────────────────────────────────────
-
-function createSearchBox(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'search-container';
-
-    const inputContainer = document.createElement('div');
-    inputContainer.className = 'search-input-container';
-
-    const searchIcon = document.createElement('span');
-    searchIcon.className = 'search-icon codicon codicon-search';
-    searchIcon.setAttribute('aria-hidden', 'true');
-
-    const input = document.createElement('input');
-    input.type = 'search';
-    input.className = 'search-input';
-    input.placeholder = 'Search extensions in Marketplace';
-    input.setAttribute('aria-label', 'Search extensions');
-    input.spellcheck = false;
-    input.autocomplete = 'off';
-    input.value = currentQuery;
-
-    const clearButton = document.createElement('button');
-    clearButton.className = 'search-clear-button';
-    clearButton.setAttribute('aria-label', 'Clear search');
-    clearButton.title = 'Clear search';
-    clearButton.innerHTML = '<span class="codicon codicon-close"></span>';
-    clearButton.style.display = currentQuery ? 'flex' : 'none';
-
-    input.addEventListener('input', () => {
-        currentQuery = input.value;
-        clearButton.style.display = currentQuery ? 'flex' : 'none';
-        renderList();
-    });
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            currentQuery = '';
-            input.value = '';
-            clearButton.style.display = 'none';
-            renderList();
-        }
-    });
-
-    clearButton.addEventListener('click', () => {
-        currentQuery = '';
-        input.value = '';
-        clearButton.style.display = 'none';
-        input.focus();
-        renderList();
-    });
-
-    inputContainer.appendChild(searchIcon);
-    inputContainer.appendChild(input);
-    inputContainer.appendChild(clearButton);
-    container.appendChild(inputContainer);
-
-    return container;
-}
-
-// ── List rendering ───────────────────────────────────────────────────────────
-
-function renderList(): void {
-    const listContainer = document.getElementById('list-container');
-    if (!listContainer) {
+function render(): void {
+    const root = document.getElementById('root');
+    if (!root) {
         return;
     }
+    root.innerHTML = '';
 
-    listContainer.innerHTML = '';
-
-    const filtered = getFilteredExtensions();
-    const visible = filtered.slice(0, PAGE_SIZE);
-
-    if (filtered.length === 0) {
+    if (extensions.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'empty-message';
-        empty.textContent = currentQuery ? `No extensions found matching "${currentQuery}".` : 'No extensions found.';
-        listContainer.appendChild(empty);
+        empty.textContent = 'No extensions found.';
+        root.appendChild(empty);
         return;
     }
 
@@ -287,35 +201,11 @@ function renderList(): void {
     list.className = 'extensions-list';
     list.setAttribute('role', 'list');
 
-    for (const entry of visible) {
+    for (const entry of extensions) {
         list.appendChild(createExtensionItem(entry));
     }
 
-    listContainer.appendChild(list);
-
-    if (filtered.length > PAGE_SIZE) {
-        const overflow = document.createElement('div');
-        overflow.className = 'overflow-message';
-        overflow.textContent = `Showing ${PAGE_SIZE} of ${filtered.length} extensions. Refine your search to see more.`;
-        listContainer.appendChild(overflow);
-    }
-}
-
-// ── Initial render ───────────────────────────────────────────────────────────
-
-function render(): void {
-    const root = document.getElementById('root');
-    if (!root) {
-        return;
-    }
-
-    root.appendChild(createSearchBox());
-
-    const listContainer = document.createElement('div');
-    listContainer.id = 'list-container';
-    root.appendChild(listContainer);
-
-    renderList();
+    root.appendChild(list);
 }
 
 render();
