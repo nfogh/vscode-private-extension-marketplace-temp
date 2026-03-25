@@ -8,6 +8,98 @@ body {
 
 #root {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ── Search box ── */
+
+.search-container {
+    flex-shrink: 0;
+    padding: 8px 8px 4px;
+    background-color: var(--vscode-sideBar-background);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.search-input-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--vscode-input-background);
+    border: 1px solid var(--vscode-input-border, transparent);
+    border-radius: 2px;
+    height: 26px;
+    padding: 0 4px;
+    gap: 4px;
+}
+
+.search-input-container:focus-within {
+    border-color: var(--vscode-focusBorder);
+    outline: none;
+}
+
+.search-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--vscode-input-placeholderForeground);
+    pointer-events: none;
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--vscode-input-foreground);
+    font-size: 13px;
+    font-family: inherit;
+    min-width: 0;
+    padding: 0;
+    /* Remove browser default search input decorations */
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.search-input::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+}
+
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-decoration {
+    display: none;
+}
+
+.search-clear-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    color: var(--vscode-icon-foreground);
+    opacity: 0.8;
+}
+
+.search-clear-button:hover {
+    opacity: 1;
+    background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.search-clear-button .codicon {
+    font-size: 14px;
+}
+
+/* ── Scrollable list area ── */
+
+#list-container {
+    flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -215,5 +307,14 @@ body {
     padding: 20px 12px;
     color: var(--vscode-descriptionForeground);
     font-size: 13px;
+    text-align: center;
+}
+
+/* ── Overflow notice ── */
+
+.overflow-message {
+    padding: 8px 12px 12px;
+    color: var(--vscode-descriptionForeground);
+    font-size: 11px;
     text-align: center;
 }
