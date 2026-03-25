@@ -1,5 +1,14 @@
 # Change Log
 
+## 1.12.1
+
+-   Added: Limit the number of visible extensions in the extension list
+-   Added: Search box to filter extensions
+
+## 1.12.0
+
+-   Updated: Mimic the look-and-feel of the normal vscode extension list
+
 ## 1.11.4
 
 -   Fixed: Fix parsing of vsix files in filesystem provider where nls substitution was used. Fixes #11
