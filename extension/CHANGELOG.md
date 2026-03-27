@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.12.2
+
+-   Added: Image to the readme to see how the extension looks
+-   Added: Autodetect registry type in "add user registry"
+-   Fixed: Some documentation was still NPM-only.
+
 ## 1.12.1
 
 -   Added: Limit the number of visible extensions in the extension list

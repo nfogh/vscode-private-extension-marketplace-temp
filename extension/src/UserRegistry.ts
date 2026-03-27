@@ -24,7 +24,7 @@ export function setUserRegistryConfig(registries: readonly UserRegistry[]) {
     );
 }
 
-export function addUserRegistry(name: string, registry: string): void {
+export function addUserRegistry(name: string, type: 'npm' | 'vsx' | 'file' | undefined, registry: string): void {
     const userRegistries = getUserRegistryConfig();
 
     if (userRegistries.some((other) => name === other.name)) {
@@ -33,6 +33,7 @@ export function addUserRegistry(name: string, registry: string): void {
 
     userRegistries.push({
         name,
+        type,
         registry,
     });
 

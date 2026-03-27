@@ -3,7 +3,7 @@
     "type": "object",
     "definitions": {
         "registries": {
-            "description": "List of NPM registries to search for private extensions. See https://github.com/npm/npm-registry-fetch#fetch-opts for additional properties.",
+            "description": "List of registries to search for private extensions. For NPM registries, see https://github.com/npm/npm-registry-fetch#fetch-opts for additional properties.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -20,7 +20,7 @@
                         "type": "string"
                     },
                     "type": {
-                        "description": "The type of the registry. Defaults to npm.",
+                        "description": "The type of the registry. If not provided, the extension will try to auto-detect.",
                         "type": "string",
                         "enum": [
                             "npm",
