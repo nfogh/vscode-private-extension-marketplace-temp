@@ -36,7 +36,6 @@
     ],
     "main": "./dist/extension.js",
     "scripts": {
-        "deploy": "vsce publish && ovsx publish",
         "vscode:prepublish": "npm run package",
         "clean": "rimraf ./dist ./out",
         "compile": "webpack",

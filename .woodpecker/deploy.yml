@@ -22,7 +22,9 @@ steps:
     commands:
       - cd /woodpecker/git/${EXTENSION}
       - npm ci
-      - npm run deploy
+      - npx vsce publish -i extension.vsix
+      - npx ovsx publish -i extension.vsix
+
 
 depends_on:
   - build
