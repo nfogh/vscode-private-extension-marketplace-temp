@@ -19,4 +19,4 @@ steps:
       - npm ci
       - npm run lint
       - xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' npm run test
-      - npx vsce package
+      - npx vsce package --baseImagesUrl=https://codeberg.org/nfogh/vscode-private-extension-marketplace/raw/commit/$(git rev-parse HEAD)/main/${EXTENSION}
