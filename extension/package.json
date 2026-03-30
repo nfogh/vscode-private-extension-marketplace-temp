@@ -1,8 +1,8 @@
 {
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
-    "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.12.3",
+    "description": "Manages private extensions hosted in file shares or NPM/OpenVSX registries.",
+    "version": "1.12.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
