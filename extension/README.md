@@ -6,6 +6,8 @@
 [![License](https://img.shields.io/badge/License-Apache-cyan)](https://opensource.org/licenses/Apache-2.0)
 [![Gitea Last Commit](https://img.shields.io/gitea/last-commit/nfogh/vscode-private-extension-marketplace?gitea_url=https%3A%2F%2Fcodeberg.org)](https://codeberg.org/nfogh/vscode-private-extension-marketplace/src/branch/main/extension)
 
+![GUI](./media/readme/activity-bar-webview.png)
+
 Extensions are what makes VS Code a great editor. The 
 [VS Code Marketplace](https://marketplace.visualstudio.com/) and
 [OpenVSX.org](https://open-vsx.org/) makes it easy to install and update

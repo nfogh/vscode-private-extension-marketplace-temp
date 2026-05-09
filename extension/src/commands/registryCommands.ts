@@ -1,14 +1,17 @@
 import * as vscode from 'vscode';
 import * as nls from 'vscode-nls/node';
 
+import { FileRegistry } from '../FileRegistry';
+import { NpmRegistry } from '../NpmRegistry';
 import { Registry } from '../Registry';
 import * as UserRegistry from '../UserRegistry';
+import { VsxRegistry } from '../VsxRegistry';
 
 const localize = nls.loadMessageBundle();
 
 export async function AddUserRegistryCommand(): Promise<void> {
     const registry = await vscode.window.showInputBox({
-        prompt: localize('registry.url.prompt', 'Enter the URL of the NPM registry.'),
+        prompt: localize('registry.url.prompt', 'Enter the URI of the registry.'),
         placeHolder: localize('registry.url.placeholder', 'https://my-private.registry'),
         ignoreFocusOut: true,
     });
@@ -17,9 +20,31 @@ export async function AddUserRegistryCommand(): Promise<void> {
         return;
     }
 
+    let type: 'npm' | 'vsx' | 'file' | undefined = undefined;
+    if (await NpmRegistry.isRegistry(registry)) {
+        type = 'npm';
+    } else if (await VsxRegistry.isRegistry(registry)) {
+        type = 'vsx';
+    } else if (await FileRegistry.isRegistry(registry)) {
+        type = 'file';
+    } else {
+        const type_str = await vscode.window.showQuickPick(['npm', 'vsx', 'file'], {
+            title: localize('registry.type.prompt', 'Enter the type of the registry.'),
+            canPickMany: false,
+            ignoreFocusOut: true,
+        });
+
+        if (type_str === 'npm' || type_str === 'vsx' || type_str === 'file') {
+            type = type_str;
+        }
+    }
+    if (!type) {
+        return;
+    }
+
     const name = await vscode.window.showInputBox({
         prompt: localize('registry.name.prompt', 'Enter a name for the registry: {0}.', registry),
-        placeHolder: localize('registry.name.placeholder', 'Registry name'),
+        placeHolder: localize('registry.name.placeholder', registry),
         ignoreFocusOut: true,
     });
 
@@ -27,7 +52,7 @@ export async function AddUserRegistryCommand(): Promise<void> {
         return;
     }
 
-    UserRegistry.addUserRegistry(name, registry);
+    UserRegistry.addUserRegistry(name, type, registry);
 
     const openSettingsJson = localize('open.settings.json', 'Open settings.json');
     const settingsJsonLink = `[${openSettingsJson}](command:workbench.action.openSettingsJson)`;

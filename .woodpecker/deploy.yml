@@ -22,7 +22,9 @@ steps:
     commands:
       - cd /woodpecker/git/${EXTENSION}
       - npm ci
-      - npm run deploy
+      - npx vsce publish --baseImagesUrl=https://codeberg.org/nfogh/vscode-private-extension-marketplace/raw/commit/$(git rev-parse HEAD)/${EXTENSION}
+      - npx ovsx publish --baseImagesUrl=https://codeberg.org/nfogh/vscode-private-extension-marketplace/raw/commit/$(git rev-parse HEAD)/${EXTENSION}
+
 
 depends_on:
   - build

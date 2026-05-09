@@ -2,7 +2,7 @@
     "name": "private-extension-marketplace-helper",
     "displayName": "Private Extension Marketplace: Helper",
     "description": "Lets Private Extension Marketplace work in remote workspaces.",
-    "version": "1.12.0",
+    "version": "1.12.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -32,11 +32,11 @@
     ],
     "activationEvents": [
         "onCommand:_privateExtensionMarketplace.remoteHelper.getExtension",
-        "onCommand:_privateExtensionMarketplace.remoteHelper.getPlatform"
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getPlatform",
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getRegistries"
     ],
     "main": "./dist/extension.js",
     "scripts": {
-        "deploy": "vsce publish && ovsx publish",
         "vscode:prepublish": "npm run package",
         "clean": "rimraf ./dist ./out",
         "compile": "webpack",

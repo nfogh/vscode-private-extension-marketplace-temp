@@ -20,8 +20,16 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('_privateExtensionMarketplace.remoteHelper.getPlatform', () => {
             return process.platform;
         }),
+        vscode.commands.registerCommand('_privateExtensionMarketplace.remoteHelper.getRegistries', () => {
+            return vscode.workspace.getConfiguration('privateExtensions').get<unknown[]>('registries', []);
+        }),
         vscode.extensions.onDidChange(() => {
             vscode.commands.executeCommand('_privateExtensionMarketplace.notifyExtensionsChanged');
+        }),
+        vscode.workspace.onDidChangeConfiguration((e) => {
+            if (e.affectsConfiguration('privateExtensions.registries')) {
+                vscode.commands.executeCommand('_privateExtensionMarketplace.notifyRegistriesChanged');
+            }
         }),
     );
 }

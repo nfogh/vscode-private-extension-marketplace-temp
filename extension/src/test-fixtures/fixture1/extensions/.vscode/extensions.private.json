@@ -1,0 +1,28 @@
+{
+	// This file configures the private extension manager for users of this workspace.
+	// Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+
+	// List of registries containing private extensions.
+	// Each item should have a "name", a "registry" URL, and optionally a "query" to
+	// filter which extensions are shown.
+	// See https://www.npmjs.com/package/npm-registry-fetch#fetch-opts for extra
+	// options including authentication.
+	"registries": [
+        {
+            "name": "OpenVSX",
+            "registry": "https://open-vsx.org",
+            "type": "vsx",
+            "query": "clang"
+        },
+        {
+            "name": "Private company extensions",
+            "registry": "/mnt/shared/extensions",
+            "type": "file"
+        }
+	],
+	// List of private extensions which should be recommended for users of this workspace.
+	"recommendations": [
+        "danielpinto8zz6.c-cpp-compile-run",
+        "llvm-vs-code-extensions.vscode-clangd"
+	]
+}

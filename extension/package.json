@@ -1,8 +1,8 @@
 {
     "name": "private-extension-marketplace",
     "displayName": "Private Extension Marketplace",
-    "description": "Manages extensions hosted in private NPM/OpenVSX registries.",
-    "version": "1.12.0",
+    "description": "Manages private extensions hosted in file shares or NPM/OpenVSX registries.",
+    "version": "1.12.4",
     "publisher": "NikolajFogh",
     "license": "Apache-2.0",
     "author": {
@@ -82,6 +82,13 @@
                     "scope": "machine",
                     "description": "%configuration.autoUpdate.description%",
                     "default": false
+                },
+                "privateExtensions.maxExtensionsShown": {
+                    "type": "number",
+                    "scope": "machine",
+                    "description": "%configuration.maxExtensionsShown.description%",
+                    "default": 100,
+                    "minimum": 1
                 }
             }
         },
@@ -296,7 +303,6 @@
         }
     },
     "scripts": {
-        "deploy": "vsce publish && ovsx publish",
         "vscode:prepublish": "npm run package",
         "clean": "rimraf ./dist ./out",
         "compile": "webpack",

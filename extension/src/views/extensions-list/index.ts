@@ -19,14 +19,43 @@ interface ExtensionEntry {
 interface ExtensionsListWindow {
     __EXTENSIONS__: ExtensionEntry[];
     __DEFAULT_ICON__: string;
+    __SHOW_SEARCH__: boolean;
+    __MAX_EXTENSIONS__: number;
+    __LOADING__: boolean;
 }
 
 // Cast window to access the globals injected by the extension host.
 const appWindow = window as unknown as Window & ExtensionsListWindow;
 
 const vscode = acquireVsCodeApi();
-const extensions: ExtensionEntry[] = appWindow.__EXTENSIONS__;
+const allExtensions: ExtensionEntry[] = appWindow.__EXTENSIONS__;
 const defaultIcon: string = appWindow.__DEFAULT_ICON__;
+const showSearch: boolean = appWindow.__SHOW_SEARCH__;
+const maxExtensions: number = appWindow.__MAX_EXTENSIONS__;
+const initialLoading: boolean = appWindow.__LOADING__;
+
+// ── Search state ────────────────────────────────────────────────────────────
+
+let currentQuery = '';
+
+function matchesQuery(entry: ExtensionEntry, query: string): boolean {
+    if (!query) {
+        return true;
+    }
+    const q = query.toLowerCase();
+    return (
+        entry.displayName.toLowerCase().includes(q) ||
+        entry.description.toLowerCase().includes(q) ||
+        entry.publisher.toLowerCase().includes(q) ||
+        entry.extensionId.toLowerCase().includes(q)
+    );
+}
+
+function getFilteredExtensions(): ExtensionEntry[] {
+    return allExtensions.filter((e) => matchesQuery(e, currentQuery));
+}
+
+// ── DOM helpers ─────────────────────────────────────────────────────────────
 
 function stateLabel(state: string): { text: string; className: string } | null {
     switch (state) {
@@ -95,25 +124,21 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     const name = document.createElement('span');
     name.className = 'name';
     name.textContent = entry.displayName;
+    header.appendChild(name);
 
     const label = stateLabel(entry.state);
     if (label) {
         const badge = document.createElement('span');
         badge.className = `extension-badge ${label.className}`;
         badge.textContent = label.text;
-        header.appendChild(name);
         header.appendChild(badge);
-    } else {
-        header.appendChild(name);
     }
 
     const subtitle = document.createElement('div');
     subtitle.className = 'subtitle';
-
     const publisher = document.createElement('span');
     publisher.className = 'publisher';
     publisher.textContent = entry.publisher;
-
     subtitle.appendChild(publisher);
 
     const description = document.createElement('div');
@@ -169,7 +194,6 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     item.appendChild(iconContainer);
     item.appendChild(details);
 
-    // Clicking the item body (not buttons) opens the details view
     item.addEventListener('click', () => {
         vscode.postMessage({ type: 'showExtension', extensionId: entry.extensionId });
     });
@@ -182,18 +206,84 @@ function createExtensionItem(entry: ExtensionEntry): HTMLElement {
     return item;
 }
 
-function render(): void {
-    const root = document.getElementById('root');
-    if (!root) {
+// ── Search box ───────────────────────────────────────────────────────────────
+
+function createSearchBox(): HTMLElement {
+    const container = document.createElement('div');
+    container.className = 'search-container';
+
+    const inputContainer = document.createElement('div');
+    inputContainer.className = 'search-input-container';
+
+    const searchIcon = document.createElement('span');
+    searchIcon.className = 'search-icon codicon codicon-search';
+    searchIcon.setAttribute('aria-hidden', 'true');
+
+    const input = document.createElement('input');
+    input.type = 'search';
+    input.className = 'search-input';
+    input.placeholder = 'Search extensions in Marketplace';
+    input.setAttribute('aria-label', 'Search extensions');
+    input.spellcheck = false;
+    input.autocomplete = 'off';
+    input.value = currentQuery;
+
+    const clearButton = document.createElement('button');
+    clearButton.className = 'search-clear-button';
+    clearButton.setAttribute('aria-label', 'Clear search');
+    clearButton.title = 'Clear search';
+    clearButton.innerHTML = '<span class="codicon codicon-close"></span>';
+    clearButton.style.display = currentQuery ? 'flex' : 'none';
+
+    input.addEventListener('input', () => {
+        currentQuery = input.value;
+        clearButton.style.display = currentQuery ? 'flex' : 'none';
+        renderList();
+    });
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            currentQuery = '';
+            input.value = '';
+            clearButton.style.display = 'none';
+            renderList();
+        }
+    });
+
+    clearButton.addEventListener('click', () => {
+        currentQuery = '';
+        input.value = '';
+        clearButton.style.display = 'none';
+        input.focus();
+        renderList();
+    });
+
+    inputContainer.appendChild(searchIcon);
+    inputContainer.appendChild(input);
+    inputContainer.appendChild(clearButton);
+    container.appendChild(inputContainer);
+
+    return container;
+}
+
+// ── List rendering ───────────────────────────────────────────────────────────
+
+function renderList(): void {
+    const listContainer = document.getElementById('list-container');
+    if (!listContainer) {
         return;
     }
-    root.innerHTML = '';
 
-    if (extensions.length === 0) {
+    listContainer.innerHTML = '';
+
+    const filtered = getFilteredExtensions();
+    const visible = filtered.slice(0, maxExtensions);
+
+    if (filtered.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'empty-message';
-        empty.textContent = 'No extensions found.';
-        root.appendChild(empty);
+        empty.textContent = currentQuery ? `No extensions found matching "${currentQuery}".` : 'No extensions found.';
+        listContainer.appendChild(empty);
         return;
     }
 
@@ -201,11 +291,70 @@ function render(): void {
     list.className = 'extensions-list';
     list.setAttribute('role', 'list');
 
-    for (const entry of extensions) {
+    for (const entry of visible) {
         list.appendChild(createExtensionItem(entry));
     }
 
-    root.appendChild(list);
+    listContainer.appendChild(list);
+
+    if (filtered.length > maxExtensions) {
+        const overflow = document.createElement('div');
+        overflow.className = 'overflow-message';
+        overflow.textContent = `Showing ${maxExtensions} of ${filtered.length} extensions. Refine your search to see more.`;
+        listContainer.appendChild(overflow);
+    }
+}
+
+// ── Spinner ──────────────────────────────────────────────────────────────────
+
+function setLoading(loading: boolean): void {
+    const spinner = document.getElementById('spinner');
+    const listContainer = document.getElementById('list-container');
+    if (spinner) {
+        spinner.style.display = loading ? 'flex' : 'none';
+    }
+    if (listContainer) {
+        listContainer.style.display = loading ? 'none' : 'block';
+    }
+}
+
+// ── Message handler ──────────────────────────────────────────────────────────
+
+window.addEventListener('message', (event: MessageEvent) => {
+    const message = event.data as { type: string; loading?: boolean };
+    if (message.type === 'setLoading' && message.loading !== undefined) {
+        setLoading(message.loading);
+    }
+});
+
+// ── Initial render ───────────────────────────────────────────────────────────
+
+function render(): void {
+    const root = document.getElementById('root');
+    if (!root) {
+        return;
+    }
+
+    if (showSearch) {
+        root.appendChild(createSearchBox());
+    }
+
+    const spinner = document.createElement('div');
+    spinner.id = 'spinner';
+    spinner.setAttribute('aria-label', 'Loading extensions');
+    spinner.setAttribute('role', 'status');
+    spinner.innerHTML = '<div class="spinner-ring"></div>';
+    spinner.style.display = initialLoading ? 'flex' : 'none';
+    root.appendChild(spinner);
+
+    const listContainer = document.createElement('div');
+    listContainer.id = 'list-container';
+    listContainer.style.display = initialLoading ? 'none' : 'block';
+    root.appendChild(listContainer);
+
+    if (!initialLoading) {
+        renderList();
+    }
 }
 
 render();
