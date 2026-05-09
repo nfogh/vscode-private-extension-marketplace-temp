@@ -16,6 +16,33 @@ export function getUserRegistryConfig(): UserRegistry[] {
     return userRegistries ?? [];
 }
 
+/**
+ * Gets the registry configuration from the remote helper (UI-side) when
+ * running in a remote workspace. Returns an empty array if not in a remote
+ * workspace or if the helper is unavailable.
+ */
+export async function getRemoteHelperRegistryConfig(): Promise<UserRegistry[]> {
+    if (!vscode.env.remoteName) {
+        return [];
+    }
+
+    try {
+        const raw = await vscode.commands.executeCommand<unknown[]>(
+            '_privateExtensionMarketplace.remoteHelper.getRegistries',
+        );
+
+        const registries = decodeType(raw ?? [], t.array(UserRegistry));
+        if (!registries) {
+            getLogger().log(`Invalid registry configuration from remote helper`);
+            return [];
+        }
+        return registries;
+    } catch (ex) {
+        getLogger().log(`Failed to get registries from remote helper: ${ex}`);
+        return [];
+    }
+}
+
 export function setUserRegistryConfig(registries: readonly UserRegistry[]) {
     void getConfig().update(
         'registries',

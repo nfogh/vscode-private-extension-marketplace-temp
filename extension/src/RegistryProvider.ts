@@ -12,7 +12,7 @@ import { NpmRegistry } from './NpmRegistry';
 import { Package } from './Package';
 import { Registry, RegistrySource } from './Registry';
 import { decodeType } from './typeUtil';
-import { getUserRegistryConfig } from './UserRegistry';
+import { getUserRegistryConfig, getRemoteHelperRegistryConfig } from './UserRegistry';
 import { UserRegistry } from './UserRegistryTypes';
 import { readJSON } from './util';
 import { VsxRegistry } from './VsxRegistry';
@@ -50,6 +50,10 @@ export class RegistryProvider implements Disposable {
         this.disposable = Disposable.from(
             vscode.workspace.onDidChangeWorkspaceFolders(async (e) => await this.onDidChangeWorkspaceFolders(e)),
             vscode.workspace.onDidChangeConfiguration(async (e) => await this.onDidChangeConfiguration(e)),
+            vscode.commands.registerCommand('_privateExtensionMarketplace.notifyRegistriesChanged', async () => {
+                this.userRegistries = await this.updateUserRegistries();
+                this._onDidChangeRegistries.fire();
+            }),
         );
 
         if (vscode.workspace.workspaceFolders) {
@@ -157,8 +161,17 @@ export class RegistryProvider implements Disposable {
     }
 
     async updateUserRegistries(): Promise<Registry[]> {
+        const [localConfigs, remoteConfigs] = await Promise.all([
+            Promise.resolve(getUserRegistryConfig()),
+            getRemoteHelperRegistryConfig(),
+        ]);
+
+        // Local (remote-machine) settings take precedence; remote helper
+        // (UI-machine) settings fill in any additional registries.
+        const allConfigs = [...localConfigs, ...remoteConfigs];
+
         return await Promise.all(
-            getUserRegistryConfig().map((registryConfig) =>
+            allConfigs.map((registryConfig) =>
                 createRegistry(registryConfig, this.extensionInfo, RegistrySource.User),
             ),
         );

@@ -32,7 +32,8 @@
     ],
     "activationEvents": [
         "onCommand:_privateExtensionMarketplace.remoteHelper.getExtension",
-        "onCommand:_privateExtensionMarketplace.remoteHelper.getPlatform"
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getPlatform",
+        "onCommand:_privateExtensionMarketplace.remoteHelper.getRegistries"
     ],
     "main": "./dist/extension.js",
     "scripts": {
